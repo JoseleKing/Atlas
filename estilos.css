@@ -1,0 +1,587 @@
+/* Atlas · estilos.css
+   Papel antiguo, tinta y grabado, como el resto de la colección de Almanaque. */
+
+:root {
+  --fondo: #F3EBDD;     /* papel de la página */
+  --papel: #FBF6EC;     /* tarjetas y tierra de los países del juego */
+  --tinta: #2B2420;     /* texto y bordes */
+  --relleno: #E3D6BE;   /* tono secundario */
+  --linea: #B9A88A;     /* líneas suaves */
+  --acento: #A33A2A;    /* rojo teja: aciertos, solución, botones principales */
+
+  --titulos: 'IM Fell English', Georgia, 'Times New Roman', serif;
+  --texto: 'EB Garamond', Georgia, 'Times New Roman', serif;
+  --radio: 10px;
+  --ancho-max: 440px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--tinta);
+  font-family: var(--texto);
+  font-size: 18px;
+  line-height: 1.4;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { font: inherit; color: inherit; }
+
+[hidden] { display: none !important; }
+
+.pagina {
+  max-width: var(--ancho-max);
+  margin: 0 auto;
+  padding: 0 max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+}
+
+/* ---------- Portada de arranque ---------- */
+
+.portada {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
+  background: var(--fondo);
+  transition: opacity .45s ease, visibility 0s .45s;
+}
+
+.portada--fuera { opacity: 0; visibility: hidden; }
+
+.portada__logo {
+  width: 136px;
+  height: 136px;
+  animation: asomar .6s ease-out both;
+}
+
+.portada__nombre {
+  margin: 0;
+  font-family: var(--titulos);
+  font-size: clamp(2.6rem, 12vw, 3.4rem);
+  line-height: 1;
+  animation: asomar .6s .15s ease-out both;
+}
+
+@keyframes asomar {
+  from { opacity: 0; transform: scale(.92); }
+}
+
+/* ---------- Cabecera ---------- */
+
+.cabecera {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 12px 0 10px;
+  border-bottom: 1px solid var(--linea);
+}
+
+.marca {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: normal;
+}
+
+.marca__logo { width: 48px; height: 48px; display: block; }
+
+.marca__nombre {
+  font-family: var(--titulos);
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.boton-icono {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--papel);
+  font-family: var(--titulos);
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.etiqueta:focus-visible { outline: none; }
+
+.boton-icono:focus-visible,
+.boton:focus-visible,
+.etiqueta:focus-visible .etiqueta__nombre {
+  outline: 2px solid var(--acento);
+  outline-offset: 2px;
+}
+
+.aviso-prueba {
+  margin: 10px 0 0;
+  padding: 6px 10px;
+  border: 1px dashed var(--acento);
+  border-radius: var(--radio);
+  color: var(--acento);
+  font-size: .9rem;
+  text-align: center;
+}
+
+/* ---------- Tarjetas y botones ---------- */
+
+.tarjeta {
+  background: var(--papel);
+  border: 1px solid var(--tinta);
+  border-radius: var(--radio);
+  padding: 14px 16px;
+  margin-top: 14px;
+}
+
+.subtitulo {
+  font-family: var(--titulos);
+  font-weight: normal;
+  font-size: 1.2rem;
+  margin: 0 0 8px;
+}
+
+.boton {
+  min-height: 46px;
+  padding: 8px 18px;
+  border: 1px solid var(--tinta);
+  border-radius: var(--radio);
+  background: var(--papel);
+  cursor: pointer;
+  font-size: 1.05rem;
+}
+
+.boton--principal {
+  background: var(--acento);
+  border-color: var(--acento);
+  color: var(--papel);
+}
+
+.boton--ancho { width: 100%; }
+
+.boton:disabled {
+  background: var(--relleno);
+  border-color: var(--linea);
+  color: var(--tinta);
+  opacity: .7;
+  cursor: default;
+}
+
+/* ---------- Palabra del día ---------- */
+
+.palabra { text-align: center; }
+
+.palabra__numero {
+  margin: 0;
+  font-size: .85rem;
+  letter-spacing: .08em;
+  font-variant: small-caps;
+  opacity: .75;
+}
+
+.palabra__texto {
+  margin: 2px 0 0;
+  font-family: var(--titulos);
+  font-weight: normal;
+  font-size: 2.6rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.palabra__significado {
+  margin: 4px 0 0;
+  font-style: italic;
+  font-size: 1.15rem;
+}
+
+.palabra__region {
+  margin: 8px auto 0;
+  display: inline-block;
+  padding: 2px 12px;
+  border: 1px solid var(--acento);
+  border-radius: 999px;
+  color: var(--acento);
+  font-size: .95rem;
+  animation: fundido .4s ease both;
+}
+
+.intentos {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.intento {
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--papel);
+}
+
+.intento--fallo { background: var(--tinta); }
+.intento--acierto { background: var(--acento); border-color: var(--acento); }
+
+/* ---------- Mapa ---------- */
+
+.mapa {
+  position: relative;
+  container-type: inline-size;
+  aspect-ratio: 360 / 472;
+  margin-top: 14px;
+  background: var(--fondo);
+  border: 1px solid var(--tinta);
+  border-radius: var(--radio);
+  overflow: hidden;
+  /* doble filete interior, como el marco de un grabado */
+  box-shadow: inset 0 0 0 3px var(--papel), inset 0 0 0 4px var(--linea);
+}
+
+.mapa__lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mapa__mar { fill: var(--fondo); }
+
+.mapa__reticula {
+  fill: none;
+  stroke: var(--linea);
+  stroke-width: .4;
+  opacity: .55;
+}
+
+.mapa__ecuador {
+  fill: none;
+  stroke: var(--acento);
+  stroke-width: .8;
+  stroke-dasharray: 5 3;
+  opacity: .6;
+}
+
+/* Halo de costa: líneas de agua alrededor de la tierra */
+.mapa__costa {
+  fill: none;
+  stroke: var(--linea);
+  stroke-width: 4;
+  stroke-linejoin: round;
+  opacity: .35;
+}
+
+.mapa__otros {
+  fill: var(--relleno);
+  stroke: var(--linea);
+  stroke-width: .5;
+  stroke-linejoin: round;
+}
+
+.mapa__rotulo {
+  font-family: var(--texto);
+  font-style: italic;
+  font-size: 9.5px;
+  letter-spacing: .08em;
+  fill: #9C8B6E;
+}
+
+.mapa__rosa { fill: none; stroke: #9C8B6E; stroke-width: .7; }
+.mapa__rosa-norte { fill: #9C8B6E; }
+.mapa__rosa text {
+  fill: #9C8B6E;
+  stroke: none;
+  font-family: var(--titulos);
+  font-size: 9px;
+}
+
+.mapa__marco {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: .8;
+}
+.mapa__mar.mapa__marco { fill: var(--fondo); }
+.mapa__marco--canarias { stroke-width: .6; stroke-dasharray: 2 1.5; }
+
+.mapa__guia {
+  stroke: var(--tinta);
+  stroke-width: .5;
+  opacity: .7;
+}
+
+.mapa__ancla { fill: var(--tinta); }
+
+/* Países del juego */
+.pais {
+  fill: var(--papel);
+  stroke: var(--tinta);
+  stroke-width: .6;
+  stroke-linejoin: round;
+  cursor: pointer;
+  transition: fill .2s;
+}
+
+.pais--encima { fill: #F1E6D2; }
+@media (hover: hover) {
+  .pais:hover { fill: #F1E6D2; }
+}
+
+.pais[data-estado="elegido"] { fill: #EBCFC2; }
+.pais[data-estado="fallo"] { fill: url(#rayado); cursor: default; }
+.pais[data-estado="correcto"] { fill: var(--acento); stroke: #7E2B1F; cursor: default; }
+.mapa--terminado .pais { cursor: default; }
+
+/* Nombres de los países: botones de al menos 44 × 44 px */
+.etiqueta {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--tinta);
+  font-family: var(--texto);
+  font-size: clamp(10px, 3cqi, 12.5px);
+  font-weight: 500;
+  font-variant: small-caps;
+  letter-spacing: .05em;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.etiqueta__nombre {
+  padding: 3px 6px 4px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  /* halo de papel para que se lea encima de las líneas */
+  text-shadow: 0 0 2px var(--papel), 0 0 2px var(--papel), 0 0 3px var(--papel);
+  transition: background-color .2s, border-color .2s, color .2s;
+}
+
+/* Nombre a la izquierda del punto (su final queda junto a la línea guía) */
+.etiqueta--izquierda { transform: translate(-100%, -50%); justify-content: flex-end; }
+
+/* Los nombres escritos en el mar tapan la línea guía */
+.etiqueta--mar .etiqueta__nombre {
+  background: var(--fondo);
+  text-shadow: none;
+}
+
+@media (hover: hover) {
+  .etiqueta:not(:disabled):hover .etiqueta__nombre { border-color: var(--linea); }
+}
+
+.etiqueta[data-estado="elegido"] .etiqueta__nombre {
+  background: var(--papel);
+  border-color: var(--tinta);
+  font-weight: 600;
+}
+
+.etiqueta[data-estado="fallo"] { cursor: default; }
+.etiqueta[data-estado="fallo"] .etiqueta__nombre {
+  color: rgba(43, 36, 32, .65);
+  text-decoration: line-through;
+  text-decoration-color: var(--acento);
+}
+
+.etiqueta[data-estado="correcto"] { cursor: default; }
+.etiqueta[data-estado="correcto"] .etiqueta__nombre {
+  background: var(--papel);
+  border-color: var(--acento);
+  color: var(--acento);
+  font-weight: 600;
+  text-shadow: none;
+}
+
+.etiqueta:disabled:not([data-estado]) { cursor: default; }
+
+/* Al terminar, los lugares que no son la respuesta quedan en segundo plano */
+.mapa--terminado .etiqueta:not([data-estado]) { opacity: .5; }
+
+/* Destello breve al tocar */
+.destello { animation: destello .45s ease; }
+
+@keyframes destello {
+  35% { background-color: #fff; box-shadow: 0 0 0 4px rgba(163, 58, 42, .18); }
+  100% { box-shadow: 0 0 0 0 rgba(163, 58, 42, 0); }
+}
+
+.flecha {
+  width: 14px;
+  height: 14px;
+  display: block;
+  color: var(--acento);
+  animation: fundido .5s ease both;
+}
+
+@keyframes fundido {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ---------- Barra de elección ---------- */
+
+.barra {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  margin: 12px -16px 0;
+  padding: 10px 16px max(12px, env(safe-area-inset-bottom));
+  background: var(--fondo);
+  border-top: 1px solid var(--linea);
+  display: grid;
+  gap: 8px;
+}
+
+.barra__pista {
+  margin: 0;
+  min-height: 1.4em;
+  text-align: center;
+  font-size: 1rem;
+}
+
+.barra__pista strong { font-weight: 600; }
+
+.barra__pista .flecha {
+  display: inline-block;
+  vertical-align: -2px;
+  margin: 0 2px;
+}
+
+/* ---------- Resultado ---------- */
+
+.resultado { animation: fundido .5s ease both; }
+
+.resultado__titulo {
+  margin: 0;
+  font-family: var(--titulos);
+  font-weight: normal;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.resultado__lugares { margin: 6px 0 0; text-align: center; }
+
+.equivalentes {
+  margin: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 4px 14px;
+}
+
+.equivalentes dt { opacity: .75; }
+.equivalentes dd { margin: 0; font-style: italic; }
+
+.curiosidad { margin: 0; }
+
+.estadisticas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+  text-align: center;
+}
+
+.estadistica__numero {
+  display: block;
+  font-family: var(--texto);
+  font-variant-numeric: lining-nums;
+  font-weight: 500;
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+
+.estadistica__nombre {
+  display: block;
+  font-size: .8rem;
+  line-height: 1.15;
+  opacity: .75;
+}
+
+.copiado {
+  margin: 6px 0 0;
+  min-height: 1.3em;
+  text-align: center;
+  font-size: .9rem;
+  font-style: italic;
+}
+
+.cuenta-atras {
+  margin: 6px 0 0;
+  text-align: center;
+  font-size: .95rem;
+}
+
+#cuenta-atras { font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* ---------- Diálogo de ayuda ---------- */
+
+.dialogo {
+  width: min(92vw, 400px);
+  max-height: 88vh;
+  padding: 18px 20px;
+  border: 1px solid var(--tinta);
+  border-radius: var(--radio);
+  background: var(--papel);
+  color: var(--tinta);
+}
+
+.dialogo::backdrop { background: rgba(43, 36, 32, .35); }
+
+.dialogo__titulo {
+  margin: 0 0 8px;
+  font-family: var(--titulos);
+  font-weight: normal;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.dialogo p { margin: 0 0 10px; }
+.dialogo .subtitulo { margin-top: 4px; }
+
+.dialogo__lista { margin: 0 0 12px; padding-left: 1.1em; }
+.dialogo__lista li { margin-bottom: 6px; }
+
+.dialogo form { margin-top: 14px; }
+
+/* ---------- Escritorio ---------- */
+
+@media (min-width: 600px) {
+  .pagina { padding-top: 12px; }
+  .barra { margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* ---------- Página de reinicio (/reiniciar/) ---------- */
+
+.reinicio { text-align: center; }
+.reinicio p { margin: 10px 0 16px; }
+
+.reinicio__volver {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  color: var(--tinta);
+  text-decoration: none;
+}

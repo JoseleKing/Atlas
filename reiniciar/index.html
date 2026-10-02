@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Reiniciar Atlas</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#F3EBDD">
+  <link rel="icon" href="../icons/logo.svg" type="image/svg+xml">
+  <link rel="icon" href="../icons/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../estilos.css">
+</head>
+<body>
+  <div class="pagina">
+    <header class="cabecera">
+      <div class="cabecera__hueco" aria-hidden="true"></div>
+      <h1 class="marca">
+        <img class="marca__logo" src="../icons/logo.svg" alt="">
+        <span class="marca__nombre">Atlas</span>
+      </h1>
+    </header>
+
+    <main>
+      <section class="tarjeta reinicio" id="pregunta">
+        <h2 class="resultado__titulo">Reiniciar el juego</h2>
+        <p>Se borrarán la partida de hoy, la racha y las estadísticas guardadas en este navegador. No se puede deshacer.</p>
+        <button class="boton boton--principal boton--ancho" id="boton-borrar" type="button">Borrar mi progreso</button>
+        <a class="boton boton--ancho reinicio__volver" href="../">Volver al juego</a>
+      </section>
+
+      <section class="tarjeta reinicio" id="hecho" hidden>
+        <h2 class="resultado__titulo">Hecho</h2>
+        <p>Tu progreso se ha borrado. Volviendo al juego…</p>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // Misma clave que CONFIG.CLAVE en juego.js.
+    var CLAVE = 'atlas:v1';
+    document.getElementById('boton-borrar').addEventListener('click', function () {
+      try { localStorage.removeItem(CLAVE); } catch (e) { /* sin almacenamiento */ }
+      document.getElementById('pregunta').hidden = true;
+      document.getElementById('hecho').hidden = false;
+      setTimeout(function () { location.href = '../'; }, 1200);
+    });
+  </script>
+</body>
+</html>

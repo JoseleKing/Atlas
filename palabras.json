@@ -1,0 +1,82 @@
+[
+  {
+    "palabra": "guagua",
+    "significado": "autobús",
+    "lugares": ["ES-CN", "CU", "PR", "DO"],
+    "region": "Caribe",
+    "equivalentes": { "España": "autobús", "México": "camión", "Argentina": "colectivo", "Chile": "micro" },
+    "curiosidad": "En Chile y Ecuador, «guagua» no es un autobús, sino un bebé."
+  },
+  {
+    "palabra": "pibe",
+    "significado": "chico, muchacho",
+    "lugares": ["AR", "UY"],
+    "region": "Cono Sur",
+    "equivalentes": { "España": "chaval", "México": "chamaco", "Chile": "cabro" },
+    "curiosidad": "Su femenino, «piba», es igual de habitual en Argentina y Uruguay."
+  },
+  {
+    "palabra": "pololo",
+    "significado": "novio",
+    "lugares": ["CL"],
+    "region": "Cono Sur",
+    "equivalentes": { "España": "novio", "Argentina": "novio" },
+    "curiosidad": "De ahí viene el verbo «pololear», que en Chile significa ser novios."
+  },
+  {
+    "palabra": "cuate",
+    "significado": "amigo",
+    "lugares": ["MX"],
+    "region": "Norteamérica",
+    "equivalentes": { "España": "colega", "Venezuela": "pana", "Perú": "pata" },
+    "curiosidad": "Viene del náhuatl «cóatl», que también se usaba para referirse a los mellizos."
+  },
+  {
+    "palabra": "palta",
+    "significado": "aguacate",
+    "lugares": ["AR", "CL", "PE", "UY", "BO"],
+    "region": "Andes",
+    "equivalentes": { "España": "aguacate", "México": "aguacate" },
+    "curiosidad": "«Palta» viene del quechua y «aguacate» del náhuatl: dos lenguas americanas para la misma fruta."
+  },
+  {
+    "palabra": "chompa",
+    "significado": "jersey",
+    "lugares": ["PE", "BO", "EC"],
+    "region": "Andes",
+    "equivalentes": { "España": "jersey", "México": "suéter", "Argentina": "pulóver", "Chile": "chaleco" },
+    "curiosidad": "Se cree que viene del inglés «jumper»."
+  },
+  {
+    "palabra": "ordenador",
+    "significado": "computadora",
+    "lugares": ["ES", "ES-CN"],
+    "region": "Europa",
+    "equivalentes": { "México": "computadora", "Argentina": "computadora", "Chile": "computador" },
+    "curiosidad": "España es casi el único lugar que dice «ordenador», tomado del francés «ordinateur»."
+  },
+  {
+    "palabra": "frutilla",
+    "significado": "fresa",
+    "lugares": ["AR", "CL", "UY", "BO", "PY", "EC"],
+    "region": "Cono Sur",
+    "equivalentes": { "España": "fresa", "México": "fresa" },
+    "curiosidad": "La frutilla chilena es una de las especies que dieron origen a la fresa que se cultiva hoy en todo el mundo."
+  },
+  {
+    "palabra": "popote",
+    "significado": "pajita para beber",
+    "lugares": ["MX"],
+    "region": "Norteamérica",
+    "equivalentes": { "España": "pajita", "Argentina": "sorbete", "Colombia": "pitillo", "Chile": "bombilla" },
+    "curiosidad": "Viene del náhuatl «popotl», una planta de tallos huecos con la que se hacían escobas."
+  },
+  {
+    "palabra": "pileta",
+    "significado": "piscina",
+    "lugares": ["AR", "UY", "PY"],
+    "region": "Cono Sur",
+    "equivalentes": { "España": "piscina", "México": "alberca" },
+    "curiosidad": "En otros lugares, «pileta» es un fregadero o una pila para lavar."
+  }
+]
