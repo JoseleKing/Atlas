@@ -168,6 +168,15 @@ button { font: inherit; color: inherit; }
 
 .boton--ancho { width: 100%; }
 
+.boton--enlace {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 10px;
+  color: inherit;
+  text-decoration: none;
+}
+
 .boton:disabled {
   background: var(--relleno);
   border-color: var(--linea);
