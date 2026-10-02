@@ -1,9 +1,9 @@
 # Atlas
 
-Juego diario de palabras del español. Cada día aparece una palabra que solo se usa
-en algunos lugares del mundo hispanohablante, con su significado, y hay que tocar
-en el mapa un lugar donde se diga. Tres intentos, con pistas de distancia,
-dirección y región. Forma parte de la colección de [Almanaque](https://joseleking.github.io/Almanaque/).
+Juego diario de palabras del español. Cada día aparecen tres palabras que solo se usan
+en algunos lugares del mundo hispanohablante y, una tras otra, hay que tocar en el
+mapa un lugar donde se diga cada una. Tres intentos por palabra, con pistas de
+distancia, dirección y región. Forma parte de la colección de [Almanaque](https://joseleking.github.io/Almanaque/).
 
 Es una web estática (HTML, CSS y JavaScript, sin frameworks ni compilación), lista
 para GitHub Pages e instalable como aplicación (PWA).
@@ -14,11 +14,11 @@ para GitHub Pages e instalable como aplicación (PWA).
 | --- | --- |
 | `index.html` | Estructura de la página y ayuda |
 | `estilos.css` | Estética de papel antiguo y tinta |
-| `juego.js` | Lógica: palabra del día, pistas, resultado, estadísticas, compartir, cuenta atrás |
+| `juego.js` | Lógica: palabras del día, pistas, resultado, estadísticas, compartir, cuenta atrás |
 | `mapa.js` | Lugares del mapa: nombre, región, coordenadas y dónde se escribe cada nombre |
 | `mapa-trazados.js` | Contornos de los países ya dibujados (generado, no se edita a mano) |
 | `herramientas/generar-trazados.mjs` | Script que genera `mapa-trazados.js` (solo para cambiar el encuadre) |
-| `palabras.json` | Las palabras, una por día, en orden |
+| `palabras.json` | Las palabras, agrupadas por días, en orden |
 | `manifest.json`, `sw.js` | Instalación como aplicación y uso sin conexión |
 | `reiniciar/index.html` | Página para borrar el progreso guardado |
 | `volver-almanaque.js` | Enlace de vuelta a Almanaque (copia de `Almanaque/para-los-juegos/`) |
@@ -26,7 +26,17 @@ para GitHub Pages e instalable como aplicación (PWA).
 
 ## Añadir palabras
 
-Edita solo `palabras.json`. Cada entrada:
+Edita solo `palabras.json`. Es una lista de días, y cada día es una lista con sus
+tres palabras:
+
+```json
+[
+  [ { …palabra 1… }, { …palabra 2… }, { …palabra 3… } ],
+  [ … ]
+]
+```
+
+Cada palabra:
 
 ```json
 {
@@ -42,9 +52,13 @@ Edita solo `palabras.json`. Cada entrada:
 - `lugares` usa estos códigos: `ES`, `ES-CN`, `MX`, `GT`, `SV`, `HN`, `NI`, `CR`, `PA`,
   `CU`, `DO`, `PR`, `CO`, `VE`, `EC`, `PE`, `BO`, `CL`, `AR`, `UY`, `PY`.
 - `region` es el texto de la pista tras el segundo fallo.
-- Las palabras se recorren en orden, una por día desde `FECHA_INICIO` (en `juego.js`),
-  y al acabarse se vuelve a empezar. Añade las nuevas **al final** para no cambiar
-  las de días ya jugados.
+- `equivalentes` puede quedar vacío (`{}`): entonces no se muestra esa parte.
+- Los días se recorren en orden desde `FECHA_INICIO` (en `juego.js`) y, al acabarse,
+  se vuelve a empezar. Añade los nuevos **al final** para no cambiar los ya jugados.
+  El primer día (`guagua`) es de cuando Atlas tenía una sola palabra; el juego admite
+  días con cualquier número de palabras.
+- Se gana el día (y sube la racha) acertando todas sus palabras. «Aciertos» es el
+  porcentaje de palabras acertadas.
 
 ## El mapa
 
@@ -66,7 +80,7 @@ python3 -m http.server 8000
 
 y abre <http://localhost:8000>.
 
-- **Modo de prueba:** <http://localhost:8000/?dia=3> carga la palabra 3 sin guardar
+- **Modo de prueba:** <http://localhost:8000/?dia=3> carga las palabras del día 3 sin guardar
   nada ni tocar las estadísticas.
 - **Reiniciar el juego:** visita `/reiniciar/` (por ejemplo
   <http://localhost:8000/reiniciar/>) y pulsa «Borrar mi progreso». Borra la partida

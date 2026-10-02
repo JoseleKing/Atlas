@@ -1,82 +1,272 @@
 [
-  {
-    "palabra": "guagua",
-    "significado": "autobús",
-    "lugares": ["ES-CN", "CU", "PR", "DO"],
-    "region": "Caribe",
-    "equivalentes": { "España": "autobús", "México": "camión", "Argentina": "colectivo", "Chile": "micro" },
-    "curiosidad": "En Chile y Ecuador, «guagua» no es un autobús, sino un bebé."
-  },
-  {
-    "palabra": "pibe",
-    "significado": "chico, muchacho",
-    "lugares": ["AR", "UY"],
-    "region": "Cono Sur",
-    "equivalentes": { "España": "chaval", "México": "chamaco", "Chile": "cabro" },
-    "curiosidad": "Su femenino, «piba», es igual de habitual en Argentina y Uruguay."
-  },
-  {
-    "palabra": "pololo",
-    "significado": "novio",
-    "lugares": ["CL"],
-    "region": "Cono Sur",
-    "equivalentes": { "España": "novio", "Argentina": "novio" },
-    "curiosidad": "De ahí viene el verbo «pololear», que en Chile significa ser novios."
-  },
-  {
-    "palabra": "cuate",
-    "significado": "amigo",
-    "lugares": ["MX"],
-    "region": "Norteamérica",
-    "equivalentes": { "España": "colega", "Venezuela": "pana", "Perú": "pata" },
-    "curiosidad": "Viene del náhuatl «cóatl», que también se usaba para referirse a los mellizos."
-  },
-  {
-    "palabra": "palta",
-    "significado": "aguacate",
-    "lugares": ["AR", "CL", "PE", "UY", "BO"],
-    "region": "Andes",
-    "equivalentes": { "España": "aguacate", "México": "aguacate" },
-    "curiosidad": "«Palta» viene del quechua y «aguacate» del náhuatl: dos lenguas americanas para la misma fruta."
-  },
-  {
-    "palabra": "chompa",
-    "significado": "jersey",
-    "lugares": ["PE", "BO", "EC"],
-    "region": "Andes",
-    "equivalentes": { "España": "jersey", "México": "suéter", "Argentina": "pulóver", "Chile": "chaleco" },
-    "curiosidad": "Se cree que viene del inglés «jumper»."
-  },
-  {
-    "palabra": "ordenador",
-    "significado": "computadora",
-    "lugares": ["ES", "ES-CN"],
-    "region": "Europa",
-    "equivalentes": { "México": "computadora", "Argentina": "computadora", "Chile": "computador" },
-    "curiosidad": "España es casi el único lugar que dice «ordenador», tomado del francés «ordinateur»."
-  },
-  {
-    "palabra": "frutilla",
-    "significado": "fresa",
-    "lugares": ["AR", "CL", "UY", "BO", "PY", "EC"],
-    "region": "Cono Sur",
-    "equivalentes": { "España": "fresa", "México": "fresa" },
-    "curiosidad": "La frutilla chilena es una de las especies que dieron origen a la fresa que se cultiva hoy en todo el mundo."
-  },
-  {
-    "palabra": "popote",
-    "significado": "pajita para beber",
-    "lugares": ["MX"],
-    "region": "Norteamérica",
-    "equivalentes": { "España": "pajita", "Argentina": "sorbete", "Colombia": "pitillo", "Chile": "bombilla" },
-    "curiosidad": "Viene del náhuatl «popotl», una planta de tallos huecos con la que se hacían escobas."
-  },
-  {
-    "palabra": "pileta",
-    "significado": "piscina",
-    "lugares": ["AR", "UY", "PY"],
-    "region": "Cono Sur",
-    "equivalentes": { "España": "piscina", "México": "alberca" },
-    "curiosidad": "En otros lugares, «pileta» es un fregadero o una pila para lavar."
-  }
+  [
+    {
+      "palabra": "guagua",
+      "significado": "autobús",
+      "lugares": ["ES-CN", "CU", "PR", "DO"],
+      "region": "Caribe",
+      "equivalentes": { "España": "autobús", "México": "camión", "Argentina": "colectivo", "Chile": "micro" },
+      "curiosidad": "En Chile y Ecuador, «guagua» no es un autobús, sino un bebé."
+    }
+  ],
+  [
+    {
+      "palabra": "pibe",
+      "significado": "chico, muchacho",
+      "lugares": ["AR", "UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "chaval", "México": "chamaco", "Chile": "cabro" },
+      "curiosidad": "Su femenino, «piba», es igual de habitual en Argentina y Uruguay."
+    },
+    {
+      "palabra": "cuate",
+      "significado": "amigo",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "colega", "Venezuela": "pana", "Perú": "pata" },
+      "curiosidad": "Viene del náhuatl «cóatl», que también se usaba para referirse a los mellizos."
+    },
+    {
+      "palabra": "zafacón",
+      "significado": "cubo de basura, papelera",
+      "lugares": ["DO", "PR"],
+      "region": "Caribe",
+      "equivalentes": { "España": "cubo de basura", "México": "bote de basura", "Argentina": "tacho de basura", "Colombia": "caneca" },
+      "curiosidad": "Sirve igual para la papelera de la oficina que para el contenedor de la calle."
+    }
+  ],
+  [
+    {
+      "palabra": "pololo",
+      "significado": "novio",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "novio", "Argentina": "novio" },
+      "curiosidad": "De ahí viene el verbo «pololear», que en Chile significa ser novios."
+    },
+    {
+      "palabra": "chompipe",
+      "significado": "pavo",
+      "lugares": ["GT", "SV", "HN", "NI", "CR"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "pavo", "México": "guajolote", "Cuba": "guanajo" },
+      "curiosidad": "Se cree que viene del náhuatl, igual que el «guajolote» mexicano."
+    },
+    {
+      "palabra": "tinto",
+      "significado": "café solo",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "café solo", "Venezuela": "negrito", "México": "café negro" },
+      "curiosidad": "Fuera de Colombia, quien pide un «tinto» suele recibir una copa de vino."
+    }
+  ],
+  [
+    {
+      "palabra": "palta",
+      "significado": "aguacate",
+      "lugares": ["AR", "CL", "PE", "UY", "BO"],
+      "region": "Andes",
+      "equivalentes": { "España": "aguacate", "México": "aguacate" },
+      "curiosidad": "«Palta» viene del quechua y «aguacate» del náhuatl: dos lenguas americanas para la misma fruta."
+    },
+    {
+      "palabra": "zumo",
+      "significado": "jugo de fruta",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "jugo", "Argentina": "jugo", "Colombia": "jugo" },
+      "curiosidad": "En España también se dice «jugo», pero sobre todo para el de la carne o en sentido figurado: «sacarle jugo»."
+    },
+    {
+      "palabra": "asere",
+      "significado": "amigo, colega",
+      "lugares": ["CU"],
+      "region": "Caribe",
+      "equivalentes": { "España": "colega", "México": "cuate", "Venezuela": "pana" },
+      "curiosidad": "Se suele atribuir a la lengua efik de los abakuás, una sociedad de origen africano asentada en Cuba."
+    }
+  ],
+  [
+    {
+      "palabra": "chompa",
+      "significado": "jersey",
+      "lugares": ["PE", "BO", "EC"],
+      "region": "Andes",
+      "equivalentes": { "España": "jersey", "México": "suéter", "Argentina": "pulóver", "Chile": "chaleco" },
+      "curiosidad": "Se cree que viene del inglés «jumper»."
+    },
+    {
+      "palabra": "pisto",
+      "significado": "dinero",
+      "lugares": ["GT", "SV", "HN"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "pasta", "México": "lana", "Argentina": "guita" },
+      "curiosidad": "En España, el pisto es un guiso de verduras, como el pisto manchego."
+    },
+    {
+      "palabra": "millo",
+      "significado": "maíz",
+      "lugares": ["ES-CN"],
+      "region": "Canarias",
+      "equivalentes": { "España": "maíz", "México": "maíz", "Argentina": "maíz" },
+      "curiosidad": "Viene del portugués «milho». Con millo tostado se hace el gofio, otro emblema canario."
+    }
+  ],
+  [
+    {
+      "palabra": "ordenador",
+      "significado": "computadora",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "computadora", "Argentina": "computadora", "Chile": "computador" },
+      "curiosidad": "España es casi el único lugar que dice «ordenador», tomado del francés «ordinateur»."
+    },
+    {
+      "palabra": "cambur",
+      "significado": "plátano, banana",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "plátano", "Argentina": "banana", "Puerto Rico": "guineo" },
+      "curiosidad": "En Venezuela, «plátano» es solo el grande que se come frito o cocido."
+    },
+    {
+      "palabra": "botija",
+      "significado": "niño, chaval",
+      "lugares": ["UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "crío", "Argentina": "pibe", "Chile": "cabro chico" },
+      "curiosidad": "En el resto del mundo hispanohablante, una botija es una vasija de barro."
+    }
+  ],
+  [
+    {
+      "palabra": "frutilla",
+      "significado": "fresa",
+      "lugares": ["AR", "CL", "UY", "BO", "PY", "EC"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "fresa", "México": "fresa" },
+      "curiosidad": "La frutilla chilena es una de las especies que dieron origen a la fresa que se cultiva hoy en todo el mundo."
+    },
+    {
+      "palabra": "elote",
+      "significado": "mazorca de maíz tierno",
+      "lugares": ["MX", "GT", "SV", "HN", "NI", "CR"],
+      "region": "Mesoamérica",
+      "equivalentes": { "España": "mazorca", "Argentina": "choclo", "Venezuela": "jojoto" },
+      "curiosidad": "Viene del náhuatl «élotl»."
+    },
+    {
+      "palabra": "china",
+      "significado": "naranja",
+      "lugares": ["PR"],
+      "region": "Caribe",
+      "equivalentes": { "España": "naranja", "México": "naranja" },
+      "curiosidad": "Las naranjas dulces llegaron a Europa desde Asia, y por eso se llamaron «naranjas de la China»."
+    }
+  ],
+  [
+    {
+      "palabra": "popote",
+      "significado": "pajita para beber",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "pajita", "Argentina": "sorbete", "Colombia": "pitillo", "Chile": "bombilla" },
+      "curiosidad": "Viene del náhuatl «popotl», una planta de tallos huecos con la que se hacían escobas."
+    },
+    {
+      "palabra": "guambra",
+      "significado": "niño, muchacho",
+      "lugares": ["EC"],
+      "region": "Andes",
+      "equivalentes": { "España": "chaval", "México": "chamaco", "Argentina": "pibe" },
+      "curiosidad": "Viene del quechua «wambra», que significa muchacho."
+    },
+    {
+      "palabra": "remera",
+      "significado": "camiseta",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "camiseta", "Chile": "polera", "Venezuela": "franela" },
+      "curiosidad": "Se cree que viene de las camisetas sin cuello que usaban los remeros."
+    }
+  ],
+  [
+    {
+      "palabra": "pileta",
+      "significado": "piscina",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "piscina", "México": "alberca" },
+      "curiosidad": "En otros lugares, «pileta» es un fregadero o una pila para lavar."
+    },
+    {
+      "palabra": "mae",
+      "significado": "tío, colega (para llamar a alguien)",
+      "lugares": ["CR"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "tío", "México": "güey", "Colombia": "parce" },
+      "curiosidad": "Viene de «maje», que en Centroamérica significa tonto, pero hoy en Costa Rica se dice con cariño."
+    },
+    {
+      "palabra": "huachafo",
+      "significado": "cursi",
+      "lugares": ["PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "cursi", "Chile": "siútico" },
+      "curiosidad": "Mario Vargas Llosa dedicó un ensayo a la «huachafería», a la que consideraba una aportación peruana a la cultura universal."
+    }
+  ],
+  [
+    {
+      "palabra": "tereré",
+      "significado": "infusión fría de yerba mate",
+      "lugares": ["PY"],
+      "region": "Cono Sur",
+      "equivalentes": {},
+      "curiosidad": "La UNESCO declaró el tereré Patrimonio Cultural Inmaterial de la Humanidad en 2020."
+    },
+    {
+      "palabra": "chamo",
+      "significado": "chico, muchacho",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "chaval", "México": "chavo", "Argentina": "pibe" },
+      "curiosidad": "Se suele decir que viene del inglés «chum», compañero."
+    },
+    {
+      "palabra": "patata",
+      "significado": "papa",
+      "lugares": ["ES"],
+      "region": "Europa",
+      "equivalentes": { "Canarias": "papa", "México": "papa", "Argentina": "papa" },
+      "curiosidad": "Canarias dice «papa», como América. «Patata» nació de cruzar «papa» con «batata»."
+    }
+  ],
+  [
+    {
+      "palabra": "fome",
+      "significado": "aburrido, soso",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "soso", "México": "aburrido", "Argentina": "aburrido" },
+      "curiosidad": "En Chile pueden ser fomes una película, un plan o una persona."
+    },
+    {
+      "palabra": "chumpa",
+      "significado": "chaqueta",
+      "lugares": ["GT", "SV", "HN"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "chaqueta", "México": "chamarra", "Argentina": "campera" },
+      "curiosidad": "Como la «chompa» andina, se cree que viene del inglés «jumper»."
+    },
+    {
+      "palabra": "guayabo",
+      "significado": "resaca",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "resaca", "México": "cruda", "Chile": "caña" },
+      "curiosidad": "En Colombia también es la nostalgia que deja una ruptura amorosa."
+    }
+  ]
 ]

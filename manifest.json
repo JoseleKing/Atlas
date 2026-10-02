@@ -1,7 +1,7 @@
 {
   "name": "Atlas",
   "short_name": "Atlas",
-  "description": "Cada día, una palabra del español. ¿Sabes dónde se dice?",
+  "description": "Cada día, tres palabras del español. ¿Sabes dónde se dicen?",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

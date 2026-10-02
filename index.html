@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Atlas</title>
-  <meta name="description" content="Atlas: cada día, una palabra del español. ¿Sabes dónde se dice?">
+  <meta name="description" content="Atlas: cada día, tres palabras del español. ¿Sabes dónde se dicen?">
   <meta name="theme-color" content="#F3EBDD">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/logo.svg" type="image/svg+xml">
@@ -51,10 +51,11 @@
     <p class="aviso-prueba" id="aviso-prueba" hidden></p>
 
     <main id="juego" aria-live="polite">
-      <!-- Palabra del día -->
+      <!-- Palabra en juego (hay tres al día, una tras otra) -->
       <section class="tarjeta palabra" id="palabra-bloque">
         <p class="palabra__numero" id="palabra-numero">Atlas</p>
         <h2 class="palabra__texto" id="palabra-texto">…</h2>
+        <p class="palabra__significado" id="palabra-significado" hidden></p>
         <p class="palabra__significado" id="palabra-error" hidden></p>
         <p class="palabra__region" id="palabra-region" hidden></p>
         <div class="intentos" id="intentos" aria-label="Intentos"></div>
@@ -63,7 +64,7 @@
       <!-- Mapa: se dibuja desde juego.js con los contornos de mapa-trazados.js y los nombres de mapa.js -->
       <section class="mapa" id="mapa" aria-label="Mapa del mundo hispanohablante"></section>
 
-      <!-- Barra para confirmar el lugar elegido y ver la última pista -->
+      <!-- Barra para confirmar el lugar elegido, ver la última pista y pasar a la siguiente palabra -->
       <div class="barra" id="barra">
         <p class="barra__pista" id="pista">Toca en el mapa un lugar donde se diga esta palabra.</p>
         <button class="boton boton--principal" id="boton-elegir" type="button" disabled>Elige un lugar</button>
@@ -73,18 +74,10 @@
       <section class="resultado" id="resultado" hidden>
         <div class="tarjeta">
           <h2 class="resultado__titulo" id="resultado-titulo"></h2>
-          <p class="resultado__lugares" id="resultado-lugares"></p>
         </div>
 
-        <div class="tarjeta">
-          <h3 class="subtitulo">Y en otros sitios se dice…</h3>
-          <dl class="equivalentes" id="equivalentes"></dl>
-        </div>
-
-        <div class="tarjeta">
-          <h3 class="subtitulo">Curiosidad</h3>
-          <p class="curiosidad" id="curiosidad"></p>
-        </div>
+        <!-- Una tarjeta por palabra: solución, equivalentes y curiosidad (se crean desde juego.js) -->
+        <div id="resultado-palabras"></div>
 
         <div class="tarjeta">
           <h3 class="subtitulo">Estadísticas</h3>
@@ -92,7 +85,7 @@
           <button class="boton boton--principal boton--ancho" id="boton-compartir" type="button">Compartir</button>
           <a class="boton boton--ancho boton--enlace" data-almanaque-volver hidden href="https://joseleking.github.io/Almanaque/">☜ Regresar al Almanaque</a>
           <p class="copiado" id="copiado" role="status"></p>
-          <p class="cuenta-atras">Próxima palabra en <span id="cuenta-atras">--:--:--</span></p>
+          <p class="cuenta-atras">Próximas palabras en <span id="cuenta-atras">--:--:--</span></p>
         </div>
       </section>
     </main>
@@ -101,15 +94,15 @@
   <!-- Ayuda -->
   <dialog class="dialogo" id="ayuda" aria-labelledby="ayuda-titulo">
     <h2 class="dialogo__titulo" id="ayuda-titulo">Cómo se juega</h2>
-    <p>Cada día aparece una palabra del español que solo se usa en algunos lugares del mundo hispanohablante.</p>
-    <p><strong>Toca en el mapa un lugar donde se diga</strong> y confirma. Si se usa en varios sitios, vale cualquiera. Tienes <strong>tres intentos</strong>.</p>
+    <p>Cada día aparecen tres palabras del español que solo se usan en algunos lugares del mundo hispanohablante. Se juegan una tras otra.</p>
+    <p>Con cada una, <strong>toca en el mapa un lugar donde se diga</strong> y confirma. Si se usa en varios sitios, vale cualquiera. Tienes <strong>tres intentos por palabra</strong>.</p>
     <h3 class="subtitulo">Pistas</h3>
     <ul class="dialogo__lista">
       <li><strong>Al primer fallo</strong>, una flecha señala hacia el lugar correcto más cercano y te dice si estás <em>caliente</em> (a menos de 1.500 km), <em>templado</em> (a menos de 4.000 km) o <em>frío</em>.</li>
       <li><strong>Al segundo fallo</strong>, se desvela la región: Caribe, Andes, Cono Sur…</li>
-      <li><strong>Al tercero</strong>, se acaba la partida y verás la solución.</li>
+      <li><strong>Al tercero</strong>, verás la solución y pasarás a la siguiente palabra.</li>
     </ul>
-    <p>Hay una palabra nueva cada día a medianoche (hora de España).</p>
+    <p>Hay tres palabras nuevas cada día a medianoche (hora de España). Para mantener la racha, acierta las tres.</p>
     <form method="dialog">
       <button class="boton boton--principal boton--ancho" type="submit">A jugar</button>
     </form>

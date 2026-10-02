@@ -1,19 +1,20 @@
 /* Atlas · juego.js
-   Lógica del juego: palabra del día, intentos y pistas, resultado, estadísticas,
+   Lógica del juego: palabras del día, intentos y pistas, resultado, estadísticas,
    compartir y cuenta atrás.
 
-   Para añadir palabras basta con editar palabras.json: se recorren en orden,
-   una por día a partir de FECHA_INICIO, y al acabarse se vuelve a empezar.
+   Para añadir palabras basta con editar palabras.json: cada elemento es un día con
+   su lista de palabras (normalmente tres), que se juegan una tras otra. Los días se
+   recorren en orden a partir de FECHA_INICIO y al acabarse se vuelve a empezar.
 
    Modo de prueba: añade ?dia=N a la dirección (por ejemplo index.html?dia=3)
-   para jugar la palabra N sin guardar nada. */
+   para jugar el día N sin guardar nada. */
 
 'use strict';
 
 /* ---------- Configuración ---------- */
 
 const CONFIG = {
-  FECHA_INICIO: '2026-10-02',  // día de la palabra #1 (hora de Madrid), en formato AAAA-MM-DD
+  FECHA_INICIO: '2026-10-02',  // día nº 1 (hora de Madrid), en formato AAAA-MM-DD
   ZONA_HORARIA: 'Europe/Madrid',
   INTENTOS: 3,
   CALIENTE_KM: 1500,           // por debajo: «Caliente»
@@ -36,7 +37,7 @@ function diasEntre(desde, hasta) {
   return Math.round((utc(hasta) - utc(desde)) / 86400000);
 }
 
-// Número de la palabra de hoy: 1 el día de inicio, 2 el siguiente…
+// Número del día de hoy: 1 el día de inicio, 2 el siguiente…
 function numeroDeHoy() {
   return Math.max(1, diasEntre(CONFIG.FECHA_INICIO, fechaMadrid()) + 1);
 }
@@ -55,15 +56,31 @@ function segundosHastaMedianoche() {
 function datosVacios() {
   return {
     ayudaVista: false,
-    partida: null, // { numero, intentos: [códigos de lugar], terminada }
-    stats: { jugadas: 0, ganadas: 0, racha: 0, mejor: 0, ultimoGanado: null, ultimoJugado: null },
+    partida: null, // { numero, ronda, rondas: [[códigos de lugar] por palabra], terminada }
+    // jugadas y ganadas cuentan días (se gana el día acertando todas sus palabras);
+    // palabras y acertadas cuentan palabras sueltas.
+    stats: { jugadas: 0, ganadas: 0, palabras: 0, acertadas: 0, racha: 0, mejor: 0, ultimoGanado: null, ultimoJugado: null },
   };
+}
+
+// Datos guardados cuando Atlas tenía una sola palabra al día.
+function migrar(guardado) {
+  const p = guardado.partida;
+  if (p && Array.isArray(p.intentos) && !Array.isArray(p.rondas)) {
+    guardado.partida = { numero: p.numero, ronda: 0, rondas: [p.intentos], terminada: p.terminada };
+  }
+  const s = guardado.stats;
+  if (s && s.palabras === undefined) {
+    s.palabras = s.jugadas || 0;
+    s.acertadas = s.ganadas || 0;
+  }
 }
 
 function cargarDatos() {
   try {
     const guardado = JSON.parse(localStorage.getItem(CONFIG.CLAVE));
     if (guardado && typeof guardado === 'object') {
+      migrar(guardado);
       const vacio = datosVacios();
       return { ...vacio, ...guardado, stats: { ...vacio.stats, ...guardado.stats } };
     }
@@ -84,9 +101,13 @@ const hoy = numeroDeHoy();
 const numero = modoPrueba ? Number(parametroDia) : hoy;
 
 let datos = cargarDatos();
-let palabra = null;      // entrada de palabras.json
-let intentos = [];       // [{ codigo, acierto, km, rumbo, temperatura }]
-let terminada = false;
+let dia = [];            // palabras de hoy (entradas de palabras.json)
+let rondas = [];         // intentos de cada palabra: [[{ codigo, acierto, km, rumbo, temperatura }]]
+let ronda = 0;           // índice de la palabra en juego
+let palabra = null;      // dia[ronda]
+let intentos = [];       // rondas[ronda]
+let palabraTerminada = false;
+let terminada = false;   // todas las palabras del día jugadas
 let seleccion = null;    // código del lugar elegido y aún no confirmado
 let temporizador = null;
 
@@ -96,14 +117,14 @@ const siluetas = {};     // código → contorno del país en el mapa
 
 /* ---------- Evaluar un intento ---------- */
 
-function evaluar(codigo) {
-  if (palabra.lugares.includes(codigo)) return { codigo, acierto: true };
+function evaluar(codigo, p = palabra) {
+  if (p.lugares.includes(codigo)) return { codigo, acierto: true };
 
   // Lugar correcto más cercano al que se ha tocado.
   const origen = LUGARES[codigo];
   let cercano = null;
   let km = Infinity;
-  for (const destino of palabra.lugares) {
+  for (const destino of p.lugares) {
     if (!LUGARES[destino]) continue;
     const d = distanciaKm(origen, LUGARES[destino]);
     if (d < km) { km = d; cercano = destino; }
@@ -111,6 +132,9 @@ function evaluar(codigo) {
   const temperatura = km < CONFIG.CALIENTE_KM ? 'caliente' : km < CONFIG.TEMPLADO_KM ? 'templado' : 'frío';
   return { codigo, acierto: false, km, rumbo: rumbo(origen, LUGARES[cercano]), temperatura };
 }
+
+// Una palabra se acaba al acertarla o al gastar los intentos.
+const acabada = (lista) => lista.some((i) => i.acierto) || lista.length >= CONFIG.INTENTOS;
 
 /* ---------- Dibujo del mapa ---------- */
 
@@ -255,7 +279,7 @@ function destello(codigo) {
 
 // Primer toque: se elige el lugar (hay que confirmarlo con el botón).
 function elegir(codigo) {
-  if (terminada || intentos.some((i) => i.codigo === codigo)) return;
+  if (palabraTerminada || intentos.some((i) => i.codigo === codigo)) return;
   if (seleccion) marcar(seleccion, '');
   seleccion = codigo;
   marcar(codigo, 'elegido');
@@ -266,36 +290,69 @@ function elegir(codigo) {
 }
 
 function confirmar() {
-  if (!seleccion || terminada) return;
+  if (palabraTerminada) { siguiente(); return; }
+  if (!seleccion) return;
   const codigo = seleccion;
   seleccion = null;
   marcar(codigo, '');
 
-  const intento = evaluar(codigo);
-  intentos.push(intento);
-  if (intento.acierto || intentos.length >= CONFIG.INTENTOS) terminada = true;
+  intentos.push(evaluar(codigo));
+  palabraTerminada = acabada(intentos);
+  terminada = palabraTerminada && ronda === dia.length - 1;
 
-  // Guardar la partida en curso (así, si se recarga, no se puede volver a empezar).
-  datos.partida = { numero, intentos: intentos.map((i) => i.codigo), terminada };
-  if (terminada) registrarEstadisticas(intento.acierto);
-  guardarDatos();
+  if (terminada) registrarEstadisticas();
+  guardarPartida();
 
   pintar(true);
   if (terminada) {
     avisarAlmanaque();
     setTimeout(() => $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
+  } else if (palabraTerminada) {
+    $('boton-elegir').focus({ preventScroll: true });
   }
+}
+
+// Pasa a la siguiente palabra del día con el mapa limpio.
+function siguiente() {
+  if (!palabraTerminada || terminada) return;
+  ponerRonda(ronda + 1);
+  for (const [codigo, etiqueta] of Object.entries(etiquetas)) {
+    const flecha = etiqueta.querySelector('.flecha');
+    if (flecha) flecha.remove();
+    etiqueta.setAttribute('aria-label', LUGARES[codigo].nombre);
+  }
+  guardarPartida();
+  pintarPalabra();
+  pintar(false);
+  $('palabra-bloque').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function ponerRonda(r) {
+  ronda = r;
+  palabra = dia[r];
+  intentos = rondas[r];
+  palabraTerminada = acabada(intentos);
+  seleccion = null;
+}
+
+// Guardar la partida en curso (así, si se recarga, no se puede volver a empezar).
+function guardarPartida() {
+  datos.partida = { numero, ronda, rondas: rondas.map((l) => l.map((i) => i.codigo)), terminada };
+  guardarDatos();
 }
 
 /* ---------- Estadísticas ---------- */
 
-function registrarEstadisticas(acierto) {
+function registrarEstadisticas() {
   if (modoPrueba) return;
   const s = datos.stats;
   if (s.ultimoJugado === numero) return; // ya contada
+  const aciertos = acertadas();
   s.jugadas += 1;
+  s.palabras += dia.length;
+  s.acertadas += aciertos;
   s.ultimoJugado = numero;
-  if (acierto) {
+  if (aciertos === dia.length) {
     s.ganadas += 1;
     s.racha = s.ultimoGanado === numero - 1 ? s.racha + 1 : 1;
     s.ultimoGanado = numero;
@@ -305,7 +362,12 @@ function registrarEstadisticas(acierto) {
   }
 }
 
-// La racha se pierde si ayer no se acertó.
+// Palabras del día acertadas.
+function acertadas() {
+  return rondas.filter((l) => l.some((i) => i.acierto)).length;
+}
+
+// La racha (días seguidos acertando todas las palabras) se pierde si ayer no se acertaron.
 function rachaActual() {
   const s = datos.stats;
   return s.ultimoGanado !== null && s.ultimoGanado >= hoy - 1 ? s.racha : 0;
@@ -314,7 +376,8 @@ function rachaActual() {
 /* ---------- Pintar el estado ---------- */
 
 function pintarPalabra() {
-  $('palabra-numero').textContent = `Atlas · nº ${numero}`;
+  const cual = dia.length > 1 ? ` · palabra ${ronda + 1} de ${dia.length}` : '';
+  $('palabra-numero').textContent = `Atlas · nº ${numero}${cual}`;
   $('palabra-texto').textContent = palabra.palabra;
 }
 
@@ -328,7 +391,12 @@ function pintarIntentos() {
     caja.appendChild(punto);
   }
   const quedan = CONFIG.INTENTOS - intentos.length;
-  caja.setAttribute('aria-label', terminada ? 'Partida terminada' : `Quedan ${quedan} intentos`);
+  caja.setAttribute('aria-label', palabraTerminada ? 'Palabra terminada' : `Quedan ${quedan} intentos`);
+
+  // Al acabar cada palabra se desvela su significado.
+  const significado = $('palabra-significado');
+  significado.textContent = palabra.significado ? `«${palabra.significado}»` : '';
+  significado.hidden = !palabraTerminada || !palabra.significado;
 }
 
 function pintarMapa(animar) {
@@ -336,11 +404,11 @@ function pintarMapa(animar) {
     const intento = intentos.find((i) => i.codigo === codigo);
     const correcta = palabra.lugares.includes(codigo);
     let estado = '';
-    if (correcta && (terminada || intento)) estado = 'correcto';
+    if (correcta && (palabraTerminada || intento)) estado = 'correcto';
     else if (intento) estado = 'fallo';
     else if (codigo === seleccion) estado = 'elegido';
     marcar(codigo, estado);
-    etiqueta.disabled = terminada || !!intento;
+    etiqueta.disabled = palabraTerminada || !!intento;
 
     // Flecha de pista junto al nombre de los lugares fallados
     if (intento && !intento.acierto && !etiqueta.querySelector('.flecha')) {
@@ -350,7 +418,7 @@ function pintarMapa(animar) {
       etiqueta.setAttribute('aria-label', `${LUGARES[codigo].nombre}: ${intento.temperatura}, hacia el ${nombreRumbo(intento.rumbo)}`);
     }
   }
-  $('mapa').classList.toggle('mapa--terminado', terminada);
+  $('mapa').classList.toggle('mapa--terminado', palabraTerminada);
 }
 
 function pintarPista() {
@@ -361,7 +429,7 @@ function pintarPista() {
 
   // La región se desvela tras el segundo fallo.
   const region = $('palabra-region');
-  if (fallos >= 2 && !terminada) {
+  if (fallos >= 2 && !palabraTerminada) {
     region.textContent = `Pista: ${palabra.region}`;
     region.hidden = false;
   } else {
@@ -371,10 +439,20 @@ function pintarPista() {
   $('barra').hidden = terminada;
   if (terminada) return;
 
+  pista.replaceChildren();
+
+  // Palabra acabada (y quedan más): solución y botón para seguir.
+  if (palabraTerminada) {
+    const veredicto = document.createElement('strong');
+    veredicto.textContent = ultimo.acierto ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'No ha podido ser.';
+    pista.append(veredicto, ` Se dice en ${listaConY(nombresLugares(palabra))}.`);
+    boton.disabled = false;
+    boton.textContent = 'Siguiente palabra';
+    return;
+  }
+
   boton.disabled = !seleccion;
   if (!seleccion) boton.textContent = 'Elige un lugar';
-
-  pista.replaceChildren();
   if (!ultimo) {
     pista.textContent = 'Toca en el mapa un lugar donde se diga esta palabra.';
     return;
@@ -386,8 +464,51 @@ function pintarPista() {
     ` Prueba hacia el ${nombreRumbo(ultimo.rumbo)}.`);
 }
 
+const ORDINALES = ['a la primera', 'al segundo intento', 'al tercer intento'];
+const CUANTAS = ['ninguna', 'una', 'dos', 'tres', 'cuatro', 'cinco'];
+
 function listaConY(nombres) {
   return nombres.length > 1 ? `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}` : nombres[0] || '';
+}
+
+function nombresLugares(p) {
+  return p.lugares.filter((c) => LUGARES[c]).map((c) => LUGARES[c].nombre);
+}
+
+function crear(etiqueta, clase, texto) {
+  const el = document.createElement(etiqueta);
+  if (clase) el.className = clase;
+  if (texto !== undefined) el.textContent = texto;
+  return el;
+}
+
+// Tarjeta del resultado con la solución de una palabra.
+function tarjetaPalabra(p, lista) {
+  const tarjeta = crear('div', 'tarjeta resultado__palabra');
+  const ultimo = lista[lista.length - 1];
+  const acierto = !!(ultimo && ultimo.acierto);
+  if (dia.length > 1) {
+    tarjeta.appendChild(crear('p', 'resultado__veredicto' + (acierto ? ' resultado__veredicto--acierto' : ''),
+      acierto ? `Acertada ${ORDINALES[lista.length - 1]}` : 'No acertada'));
+    tarjeta.appendChild(crear('h3', 'resultado__texto', p.palabra));
+  }
+  // El significado no se muestra durante la partida: se desvela aquí.
+  const significado = p.significado ? ` significa «${p.significado}» y` : '';
+  tarjeta.appendChild(crear('p', 'resultado__lugares', `«${p.palabra}»${significado} se dice en ${listaConY(nombresLugares(p))}.`));
+
+  const equivalentes = Object.entries(p.equivalentes || {});
+  if (equivalentes.length) {
+    tarjeta.appendChild(crear('h4', 'subtitulo', 'Y en otros sitios se dice…'));
+    const dl = crear('dl', 'equivalentes');
+    for (const [lugar, dicho] of equivalentes) dl.append(crear('dt', '', lugar), crear('dd', '', dicho));
+    tarjeta.appendChild(dl);
+  }
+
+  if (p.curiosidad) {
+    tarjeta.appendChild(crear('h4', 'subtitulo', 'Curiosidad'));
+    tarjeta.appendChild(crear('p', 'curiosidad', p.curiosidad));
+  }
+  return tarjeta;
 }
 
 function pintarResultado() {
@@ -395,39 +516,26 @@ function pintarResultado() {
   caja.hidden = !terminada;
   if (!terminada) return;
 
-  const ultimo = intentos[intentos.length - 1];
-  const ordinales = ['a la primera', 'al segundo intento', 'al tercer intento'];
-  $('resultado-titulo').textContent = ultimo.acierto
-    ? `¡Acertaste ${ordinales[intentos.length - 1] || ''}!`
-    : 'Esta vez no ha podido ser';
-
-  const nombres = palabra.lugares.filter((c) => LUGARES[c]).map((c) => LUGARES[c].nombre);
-  // El significado no se muestra durante la partida: se desvela aquí.
-  const significado = palabra.significado ? ` significa «${palabra.significado}» y` : '';
-  $('resultado-lugares').textContent = `«${palabra.palabra}»${significado} se dice en ${listaConY(nombres)}.`;
-
-  // Equivalentes
-  const dl = $('equivalentes');
-  dl.replaceChildren();
-  const equivalentes = Object.entries(palabra.equivalentes || {});
-  for (const [lugar, dicho] of equivalentes) {
-    const dt = document.createElement('dt');
-    dt.textContent = lugar;
-    const dd = document.createElement('dd');
-    dd.textContent = dicho;
-    dl.append(dt, dd);
+  const aciertos = acertadas();
+  let titulo;
+  if (dia.length === 1) {
+    titulo = aciertos ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'Esta vez no ha podido ser';
+  } else if (aciertos === dia.length) {
+    titulo = `¡Acertaste las ${CUANTAS[aciertos] || aciertos}!`;
+  } else if (aciertos === 0) {
+    titulo = 'Esta vez no ha podido ser';
+  } else {
+    titulo = `Acertaste ${CUANTAS[aciertos] || aciertos} de ${CUANTAS[dia.length] || dia.length}`;
   }
-  dl.closest('.tarjeta').hidden = equivalentes.length === 0;
+  $('resultado-titulo').textContent = titulo;
 
-  // Curiosidad
-  $('curiosidad').textContent = palabra.curiosidad || '';
-  $('curiosidad').closest('.tarjeta').hidden = !palabra.curiosidad;
+  $('resultado-palabras').replaceChildren(...dia.map((p, i) => tarjetaPalabra(p, rondas[i])));
 
   // Estadísticas
   const s = datos.stats;
   const cifras = [
     [s.jugadas, 'Jugadas'],
-    [s.jugadas ? Math.round((s.ganadas / s.jugadas) * 100) + '%' : '0%', 'Aciertos'],
+    [s.palabras ? Math.round((s.acertadas / s.palabras) * 100) + '%' : '0%', 'Aciertos'],
     [rachaActual(), 'Racha actual'],
     [s.mejor, 'Mejor racha'],
   ];
@@ -458,9 +566,12 @@ function pintar(animar = false) {
 /* ---------- Compartir ---------- */
 
 function textoCompartir() {
-  const cuadros = intentos.map((i) => (i.acierto ? '🟩' : i.temperatura === 'frío' ? '🟥' : '🟧')).join('');
-  const acierto = intentos.some((i) => i.acierto);
-  return `Atlas #${numero} 🗺️\n${cuadros}  ${acierto ? intentos.length : 'X'}/${CONFIG.INTENTOS}\nRacha: ${rachaActual()}`;
+  const lineas = rondas.map((lista) => {
+    const cuadros = lista.map((i) => (i.acierto ? '🟩' : i.temperatura === 'frío' ? '🟥' : '🟧')).join('');
+    const acierto = lista.some((i) => i.acierto);
+    return `${cuadros}  ${acierto ? lista.length : 'X'}/${CONFIG.INTENTOS}`;
+  });
+  return `Atlas #${numero} 🗺️\n${lineas.join('\n')}\nRacha: ${rachaActual()}`;
 }
 
 async function compartir() {
@@ -487,7 +598,7 @@ function iniciarCuentaAtras() {
   const fechaInicial = fechaMadrid();
   const dos = (n) => String(n).padStart(2, '0');
   const tic = () => {
-    // Nuevo día: se recarga para mostrar la palabra siguiente.
+    // Nuevo día: se recarga para mostrar las palabras siguientes.
     if (!modoPrueba && fechaMadrid() !== fechaInicial) { location.reload(); return; }
     const s = segundosHastaMedianoche();
     $('cuenta-atras').textContent = `${dos(Math.floor(s / 3600))}:${dos(Math.floor((s % 3600) / 60))}:${dos(s % 60)}`;
@@ -545,11 +656,13 @@ async function iniciar() {
   $('boton-compartir').addEventListener('click', compartir);
   prepararAyuda();
 
-  let palabras;
+  let dias;
   try {
     const respuesta = await fetch('palabras.json', { cache: 'no-cache' });
-    palabras = await respuesta.json();
-    if (!Array.isArray(palabras) || palabras.length === 0) throw new Error('Lista vacía');
+    const lista = await respuesta.json();
+    // Cada día es una lista de palabras (una entrada suelta cuenta como un día de una palabra).
+    dias = (Array.isArray(lista) ? lista : []).map((d) => (Array.isArray(d) ? d : [d])).filter((d) => d.length);
+    if (dias.length === 0) throw new Error('Lista vacía');
   } catch (e) {
     $('palabra-texto').textContent = 'Vaya…';
     $('palabra-error').textContent = 'No se han podido cargar las palabras. Prueba a recargar la página.';
@@ -559,19 +672,25 @@ async function iniciar() {
     return;
   }
 
-  palabra = palabras[(numero - 1) % palabras.length];
+  dia = dias[(numero - 1) % dias.length];
+  rondas = dia.map(() => []);
+  let r = 0;
 
+  const p = datos.partida;
   if (modoPrueba) {
     const aviso = $('aviso-prueba');
-    aviso.textContent = `Modo de prueba: palabra ${numero} («${palabra.palabra}»). No se guarda nada.`;
+    aviso.textContent = `Modo de prueba: día ${numero} (${dia.map((x) => `«${x.palabra}»`).join(', ')}). No se guarda nada.`;
     aviso.hidden = false;
-  } else if (datos.partida && datos.partida.numero === numero) {
+  } else if (p && p.numero === numero && Array.isArray(p.rondas)) {
     // Partida de hoy ya empezada o terminada: se recupera.
-    intentos = datos.partida.intentos.filter((c) => LUGARES[c]).map(evaluar);
-    terminada = intentos.some((i) => i.acierto) || intentos.length >= CONFIG.INTENTOS;
+    rondas = dia.map((x, i) => (p.rondas[i] || []).filter((c) => LUGARES[c]).map((c) => evaluar(c, x)));
+    r = Math.min(Math.max(0, Number(p.ronda) || 0), dia.length - 1);
+    terminada = rondas.every(acabada);
+    if (terminada) r = dia.length - 1;
   } else {
     datos.partida = null;
   }
+  ponerRonda(r);
 
   dibujarMapa();
   pintarPalabra();

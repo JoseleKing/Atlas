@@ -488,6 +488,30 @@ button { font: inherit; color: inherit; }
 
 .resultado__lugares { margin: 6px 0 0; text-align: center; }
 
+/* Tarjeta de cada palabra del día */
+.resultado__veredicto {
+  margin: 0;
+  text-align: center;
+  font-size: .85rem;
+  letter-spacing: .08em;
+  font-variant: small-caps;
+  opacity: .75;
+}
+
+.resultado__veredicto--acierto { color: var(--acento); opacity: 1; }
+
+.resultado__texto {
+  margin: 0;
+  font-family: var(--titulos);
+  font-weight: normal;
+  font-size: 1.9rem;
+  line-height: 1.1;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.resultado__palabra .subtitulo { margin-top: 14px; }
+
 .equivalentes {
   margin: 0;
   display: grid;
