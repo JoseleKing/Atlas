@@ -64,10 +64,11 @@
       <!-- Mapa: se dibuja desde juego.js con los contornos de mapa-trazados.js y los nombres de mapa.js -->
       <section class="mapa" id="mapa" aria-label="Mapa del mundo hispanohablante"></section>
 
-      <!-- Barra para confirmar el lugar elegido, ver la última pista y pasar a la siguiente palabra -->
+      <!-- Barra con la última pista y el botón para pasar a la siguiente palabra
+           (el lugar elegido se confirma con el bocadillo que sale en el mapa) -->
       <div class="barra" id="barra">
         <p class="barra__pista" id="pista">Toca en el mapa un lugar donde se diga esta palabra.</p>
-        <button class="boton boton--principal" id="boton-elegir" type="button" disabled>Elige un lugar</button>
+        <button class="boton boton--principal" id="boton-siguiente" type="button" hidden>Siguiente palabra</button>
       </div>
 
       <!-- Resultado (aparece al terminar) -->

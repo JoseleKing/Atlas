@@ -309,9 +309,6 @@ function elegir(codigo) {
   seleccion = codigo;
   marcar(codigo, 'elegido');
   destello(codigo);
-  const boton = $('boton-elegir');
-  boton.disabled = false;
-  boton.textContent = `Elegir ${LUGARES[codigo].nombre}`;
   mostrarBocadillo();
 }
 
@@ -343,8 +340,7 @@ function colocarBocadillo() {
 }
 
 function confirmar() {
-  if (palabraTerminada) { siguiente(); return; }
-  if (!seleccion) return;
+  if (palabraTerminada || !seleccion) return;
   const codigo = seleccion;
   seleccion = null;
   marcar(codigo, '');
@@ -361,7 +357,7 @@ function confirmar() {
     avisarAlmanaque();
     setTimeout(() => $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
   } else if (palabraTerminada) {
-    $('boton-elegir').focus({ preventScroll: true });
+    $('boton-siguiente').focus({ preventScroll: true });
   }
 }
 
@@ -477,7 +473,6 @@ function pintarMapa(animar) {
 
 function pintarPista() {
   const pista = $('pista');
-  const boton = $('boton-elegir');
   const ultimo = intentos[intentos.length - 1];
   const fallos = intentos.filter((i) => !i.acierto).length;
 
@@ -491,6 +486,7 @@ function pintarPista() {
   }
 
   $('barra').hidden = terminada;
+  $('boton-siguiente').hidden = !palabraTerminada || terminada;
   if (terminada) return;
 
   pista.replaceChildren();
@@ -500,13 +496,9 @@ function pintarPista() {
     const veredicto = document.createElement('strong');
     veredicto.textContent = ultimo.acierto ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'No ha podido ser.';
     pista.append(veredicto, ` Se dice en ${listaConY(nombresLugares(palabra))}.`);
-    boton.disabled = false;
-    boton.textContent = 'Siguiente palabra';
     return;
   }
 
-  boton.disabled = !seleccion;
-  if (!seleccion) boton.textContent = 'Elige un lugar';
   if (!ultimo) {
     pista.textContent = 'Toca en el mapa un lugar donde se diga esta palabra.';
     return;
@@ -706,7 +698,7 @@ function avisarAlmanaque() {
 /* ---------- Arranque ---------- */
 
 async function iniciar() {
-  $('boton-elegir').addEventListener('click', confirmar);
+  $('boton-siguiente').addEventListener('click', siguiente);
   $('boton-compartir').addEventListener('click', compartir);
   prepararAyuda();
 
