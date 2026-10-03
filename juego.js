@@ -528,32 +528,47 @@ function crear(etiqueta, clase, texto) {
   return el;
 }
 
-// Tarjeta del resultado con la solución de una palabra.
+// Tarjeta del resultado con la solución de una palabra. A la vista quedan la
+// palabra, su significado y dónde se dice; los equivalentes y la curiosidad se
+// despliegan al tocar la palabra.
 function tarjetaPalabra(p, lista) {
-  const tarjeta = crear('div', 'tarjeta resultado__palabra');
   const ultimo = lista[lista.length - 1];
   const acierto = !!(ultimo && ultimo.acierto);
+  const cabecera = [];
   if (dia.length > 1) {
-    tarjeta.appendChild(crear('p', 'resultado__veredicto' + (acierto ? ' resultado__veredicto--acierto' : ''),
+    cabecera.push(crear('p', 'resultado__veredicto' + (acierto ? ' resultado__veredicto--acierto' : ''),
       acierto ? `Acertada ${ORDINALES[lista.length - 1]}` : 'No acertada'));
-    tarjeta.appendChild(crear('h3', 'resultado__texto', p.palabra));
+    cabecera.push(crear('h3', 'resultado__texto', p.palabra));
   }
   // El significado no se muestra durante la partida: se desvela aquí.
   const significado = p.significado ? ` significa «${p.significado}» y` : '';
-  tarjeta.appendChild(crear('p', 'resultado__lugares', `«${p.palabra}»${significado} se dice en ${listaConY(nombresLugares(p))}.`));
+  cabecera.push(crear('p', 'resultado__lugares', `«${p.palabra}»${significado} se dice en ${listaConY(nombresLugares(p))}.`));
 
+  const mas = [];
   const equivalentes = Object.entries(p.equivalentes || {});
   if (equivalentes.length) {
-    tarjeta.appendChild(crear('h4', 'subtitulo', 'Y en otros sitios se dice…'));
+    mas.push(crear('h4', 'subtitulo', 'Y en otros sitios se dice…'));
     const dl = crear('dl', 'equivalentes');
     for (const [lugar, dicho] of equivalentes) dl.append(crear('dt', '', lugar), crear('dd', '', dicho));
-    tarjeta.appendChild(dl);
+    mas.push(dl);
   }
 
   if (p.curiosidad) {
-    tarjeta.appendChild(crear('h4', 'subtitulo', 'Curiosidad'));
-    tarjeta.appendChild(crear('p', 'curiosidad', p.curiosidad));
+    mas.push(crear('h4', 'subtitulo', 'Curiosidad'));
+    mas.push(crear('p', 'curiosidad', p.curiosidad));
   }
+
+  // Sin nada más que contar, la tarjeta no se despliega.
+  if (!mas.length) {
+    const tarjeta = crear('div', 'tarjeta resultado__palabra');
+    tarjeta.append(...cabecera);
+    return tarjeta;
+  }
+
+  const tarjeta = crear('details', 'tarjeta resultado__palabra');
+  const resumen = crear('summary', 'resultado__resumen');
+  resumen.append(...cabecera, crear('span', 'resultado__mas', 'Saber más'));
+  tarjeta.append(resumen, ...mas);
   return tarjeta;
 }
 

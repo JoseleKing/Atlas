@@ -551,6 +551,38 @@ button { font: inherit; color: inherit; }
 
 .resultado__palabra .subtitulo { margin-top: 14px; }
 
+/* Desplegable: se abre tocando la palabra */
+.resultado__resumen {
+  display: block;
+  list-style: none;
+  cursor: pointer;
+}
+
+.resultado__resumen::-webkit-details-marker { display: none; }
+
+.resultado__resumen:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 4px;
+}
+
+.resultado__mas {
+  display: block;
+  margin-top: 8px;
+  text-align: center;
+  font-size: .85rem;
+  letter-spacing: .08em;
+  font-variant: small-caps;
+  color: var(--acento);
+}
+
+.resultado__mas::after {
+  content: ' ▾';
+  display: inline-block;
+  transition: transform .2s ease;
+}
+
+details[open] .resultado__mas::after { transform: rotate(180deg); }
+
 .equivalentes {
   margin: 0;
   display: grid;
