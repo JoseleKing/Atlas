@@ -80,12 +80,31 @@ const rutaCanarias = d3.geoPath(proyCanarias).digits(1);
 paths['ES'] = rutaIberia(peninsula);
 paths['ES-CN'] = rutaCanarias(canarias);
 
+/* ---------- Recuadro: Centroamérica ampliada ---------- */
+
+// En el mapa principal estos países son diminutos; aquí se dibujan más grandes,
+// en el océano Pacífico, y también se pueden tocar.
+const RECUADRO_CA = { x: 8, y: 150, ancho: 164, alto: 128 };
+const CENTROAMERICA = ['GT', 'SV', 'HN', 'NI', 'CR', 'PA'];
+
+const proyCA = d3.geoMercator()
+  .fitExtent([[RECUADRO_CA.x + 6, RECUADRO_CA.y + 6], [RECUADRO_CA.x + RECUADRO_CA.ancho - 6, RECUADRO_CA.y + RECUADRO_CA.alto - 6]],
+    { type: 'FeatureCollection', features: CENTROAMERICA.map((c) => buscar(CODIGOS[c])) })
+  .clipExtent([[RECUADRO_CA.x, RECUADRO_CA.y], [RECUADRO_CA.x + RECUADRO_CA.ancho, RECUADRO_CA.y + RECUADRO_CA.alto]]);
+const rutaCA = d3.geoPath(proyCA).digits(1);
+
+const paisesCA = {};
+for (const codigo of CENTROAMERICA) paisesCA[codigo] = rutaCA(buscar(CODIGOS[codigo]));
+const vecinosCA = paises.filter((f) => !CENTROAMERICA.some((c) => CODIGOS[c] === f.properties.name))
+  .map((f) => rutaCA(f)).filter(Boolean).join('');
+
 /* ---------- Salida ---------- */
 
 const datos = {
-  ANCHO, ALTO, RECUADRO, CAJA_CANARIAS,
+  ANCHO, ALTO, RECUADRO, CAJA_CANARIAS, RECUADRO_CA,
   paises: paths,
   otros, vecinosEspana: vecinos, reticula, ecuador,
+  paisesCA, vecinosCA,
 };
 const salida = `/* Atlas · mapa-trazados.js
    ARCHIVO GENERADO por herramientas/generar-trazados.mjs: no lo edites a mano.
@@ -100,4 +119,8 @@ console.log(`mapa-trazados.js: ${ANCHO}×${ALTO}, ${(salida.length / 1024).toFix
 for (const [codigo, nombre] of Object.entries(CODIGOS)) {
   const [x, y] = ruta.centroid(buscar(nombre));
   console.log(codigo.padEnd(6), Math.round(x), Math.round(y));
+}
+for (const codigo of CENTROAMERICA) {
+  const [x, y] = rutaCA.centroid(buscar(CODIGOS[codigo]));
+  console.log(`${codigo} (recuadro)`.padEnd(14), Math.round(x), Math.round(y));
 }

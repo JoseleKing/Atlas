@@ -113,7 +113,7 @@ let temporizador = null;
 
 const $ = (id) => document.getElementById(id);
 const etiquetas = {};    // código → botón con el nombre en el mapa
-const siluetas = {};     // código → contorno del país en el mapa
+const siluetas = {};     // código → contornos del país en el mapa (Centroamérica sale dos veces)
 
 /* ---------- Evaluar un intento ---------- */
 
@@ -172,7 +172,7 @@ function crearRosa(x, y) {
 
 function dibujarMapa() {
   const mapa = $('mapa');
-  const { ANCHO, ALTO, RECUADRO: R, CAJA_CANARIAS: C } = TRAZADOS;
+  const { ANCHO, ALTO, RECUADRO: R, CAJA_CANARIAS: C, RECUADRO_CA: CA } = TRAZADOS;
   mapa.style.aspectRatio = `${ANCHO} / ${ALTO}`;
 
   const svg = elementoSvg('svg', { class: 'mapa__lienzo', viewBox: `0 0 ${ANCHO} ${ALTO}`, 'aria-hidden': 'true' });
@@ -217,13 +217,27 @@ function dibujarMapa() {
   svg.appendChild(recuadro);
 
   // Países del juego (se pueden tocar)
-  for (const [codigo, d] of Object.entries(TRAZADOS.paises)) {
-    if (!LUGARES[codigo]) continue;
-    const pais = elementoSvg('path', { class: 'pais', d, 'data-codigo': codigo });
-    pais.addEventListener('click', () => elegir(codigo));
-    siluetas[codigo] = pais;
-    svg.appendChild(pais);
-  }
+  const dibujarPaises = (trazados, destino) => {
+    for (const [codigo, d] of Object.entries(trazados)) {
+      if (!LUGARES[codigo]) continue;
+      const pais = elementoSvg('path', { class: 'pais', d, 'data-codigo': codigo });
+      pais.addEventListener('click', () => elegir(codigo));
+      (siluetas[codigo] ||= []).push(pais);
+      destino.appendChild(pais);
+    }
+  };
+  dibujarPaises(TRAZADOS.paises, svg);
+
+  // Recuadro de Centroamérica ampliada, en el Pacífico
+  const ampliada = elementoSvg('g', { class: 'mapa__recuadro' });
+  ampliada.appendChild(elementoSvg('rect', { class: 'mapa__mar mapa__marco', x: CA.x, y: CA.y, width: CA.ancho, height: CA.alto }));
+  ampliada.appendChild(elementoSvg('path', { class: 'mapa__costa', d: TRAZADOS.vecinosCA + Object.values(TRAZADOS.paisesCA).join('') }));
+  ampliada.appendChild(elementoSvg('path', { class: 'mapa__otros', d: TRAZADOS.vecinosCA }));
+  dibujarPaises(TRAZADOS.paisesCA, ampliada);
+  const titulo = elementoSvg('text', { class: 'mapa__rotulo', x: CA.x + 6, y: CA.y + CA.alto - 7 });
+  titulo.textContent = 'Centroamérica';
+  ampliada.appendChild(titulo);
+  svg.appendChild(ampliada);
 
   // Líneas guía de los países pequeños
   for (const lugar of Object.values(LUGARES)) {
@@ -252,18 +266,29 @@ function dibujarMapa() {
 
     boton.addEventListener('click', () => elegir(codigo));
     // Al pasar el ratón por el nombre, se resalta también el país
-    boton.addEventListener('mouseenter', () => siluetas[codigo] && siluetas[codigo].classList.add('pais--encima'));
-    boton.addEventListener('mouseleave', () => siluetas[codigo] && siluetas[codigo].classList.remove('pais--encima'));
+    boton.addEventListener('mouseenter', () => (siluetas[codigo] || []).forEach((p) => p.classList.add('pais--encima')));
+    boton.addEventListener('mouseleave', () => (siluetas[codigo] || []).forEach((p) => p.classList.remove('pais--encima')));
     etiquetas[codigo] = boton;
     mapa.appendChild(boton);
   }
+
+  // Bocadillo para confirmar junto al lugar elegido: así se ve aunque se haya
+  // ampliado la pantalla con los dedos y la barra de abajo quede fuera de la vista.
+  const bocadillo = document.createElement('button');
+  bocadillo.type = 'button';
+  bocadillo.id = 'bocadillo';
+  bocadillo.className = 'bocadillo';
+  bocadillo.hidden = true;
+  bocadillo.addEventListener('click', confirmar);
+  mapa.appendChild(bocadillo);
+  new ResizeObserver(() => { if (!bocadillo.hidden) colocarBocadillo(); }).observe(mapa);
 }
 
 /* ---------- Interacción ---------- */
 
 // Cambia el estado de un lugar en el mapa: '', 'elegido', 'fallo' o 'correcto'.
 function marcar(codigo, estado) {
-  for (const el of [etiquetas[codigo], siluetas[codigo]]) {
+  for (const el of [etiquetas[codigo], ...(siluetas[codigo] || [])]) {
     if (!el) continue;
     if (estado) el.dataset.estado = estado;
     else delete el.dataset.estado;
@@ -287,6 +312,34 @@ function elegir(codigo) {
   const boton = $('boton-elegir');
   boton.disabled = false;
   boton.textContent = `Elegir ${LUGARES[codigo].nombre}`;
+  mostrarBocadillo();
+}
+
+function mostrarBocadillo() {
+  const bocadillo = $('bocadillo');
+  bocadillo.hidden = !seleccion || palabraTerminada;
+  if (bocadillo.hidden) return;
+  bocadillo.textContent = `Elegir ${LUGARES[seleccion].nombre}`;
+  colocarBocadillo();
+}
+
+// Encima del nombre elegido (o debajo, si arriba no cabe), sin salirse del mapa.
+function colocarBocadillo() {
+  const mapa = $('mapa');
+  const bocadillo = $('bocadillo');
+  const caja = mapa.getBoundingClientRect();
+  const nombre = etiquetas[seleccion].querySelector('.etiqueta__nombre').getBoundingClientRect();
+  const margen = 6;
+  const ancho = bocadillo.offsetWidth;
+  const alto = bocadillo.offsetHeight;
+  const centro = nombre.left + nombre.width / 2 - caja.left;
+  const x = Math.min(Math.max(centro - ancho / 2, margen), mapa.clientWidth - ancho - margen);
+  const arriba = nombre.top - caja.top - alto - 10 >= margen;
+  const y = arriba ? nombre.top - caja.top - alto - 10 : nombre.bottom - caja.top + 10;
+  bocadillo.style.left = `${x}px`;
+  bocadillo.style.top = `${y}px`;
+  bocadillo.style.setProperty('--pico', `${Math.min(Math.max(centro - x, 14), ancho - 14)}px`);
+  bocadillo.classList.toggle('bocadillo--debajo', !arriba);
 }
 
 function confirmar() {
@@ -419,6 +472,7 @@ function pintarMapa(animar) {
     }
   }
   $('mapa').classList.toggle('mapa--terminado', palabraTerminada);
+  mostrarBocadillo();
 }
 
 function pintarPista() {

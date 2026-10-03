@@ -440,6 +440,45 @@ button { font: inherit; color: inherit; }
   animation: fundido .5s ease both;
 }
 
+/* Bocadillo para confirmar junto al lugar elegido */
+.bocadillo {
+  position: absolute;
+  z-index: 1;
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 1px solid var(--acento);
+  border-radius: 999px;
+  background: var(--acento);
+  color: var(--papel);
+  font-size: .95rem;
+  line-height: 1.1;
+  white-space: nowrap;
+  cursor: pointer;
+  touch-action: manipulation;
+  box-shadow: 0 2px 6px rgba(43, 36, 32, .25);
+  animation: fundido .2s ease both;
+}
+
+/* Pico que señala el nombre elegido */
+.bocadillo::after {
+  content: '';
+  position: absolute;
+  left: var(--pico, 50%);
+  top: 100%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: var(--acento);
+}
+
+.bocadillo--debajo::after {
+  top: auto;
+  bottom: 100%;
+  border-top-color: transparent;
+  border-bottom-color: var(--acento);
+}
+
+.bocadillo:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+
 @keyframes fundido {
   from { opacity: 0; }
   to { opacity: 1; }
