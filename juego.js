@@ -19,6 +19,7 @@ const CONFIG = {
   INTENTOS: 3,
   CALIENTE_KM: 1500,           // por debajo: «Caliente»
   TEMPLADO_KM: 4000,           // por debajo: «Templado»; por encima: «Frío»
+  MARGEN_KM: 150,              // diferencia mínima para decir «te acercas» o «te alejas»
   CLAVE: 'atlas:v1',           // clave en localStorage
 };
 
@@ -133,6 +134,9 @@ function evaluar(codigo, p = palabra) {
   return { codigo, acierto: false, km, rumbo: rumbo(origen, LUGARES[cercano]), temperatura };
 }
 
+// Clave sin tilde de la temperatura, para clases y atributos: «frio», «templado», «caliente».
+const claveTemperatura = (t) => (t === 'frío' ? 'frio' : t);
+
 // Una palabra se acaba al acertarla o al gastar los intentos.
 const acabada = (lista) => lista.some((i) => i.acierto) || lista.length >= CONFIG.INTENTOS;
 
@@ -146,9 +150,11 @@ function elementoSvg(etiqueta, atributos = {}) {
   return el;
 }
 
-// Flecha que apunta hacia arriba; se gira según el rumbo.
-function crearFlecha(grados) {
-  const svg = elementoSvg('svg', { viewBox: '0 0 20 20', class: 'flecha', 'aria-hidden': 'true' });
+// Flecha que apunta hacia arriba; se gira según el rumbo y se colorea según la temperatura.
+function crearFlecha(grados, temperatura) {
+  const svg = elementoSvg('svg', {
+    viewBox: '0 0 20 20', class: 'flecha', 'data-temperatura': claveTemperatura(temperatura), 'aria-hidden': 'true',
+  });
   const g = elementoSvg('g', { transform: `rotate(${Math.round(grados)} 10 10)` });
   g.appendChild(elementoSvg('path', {
     d: 'M10 2 L16 10 H12 V18 H8 V10 H4 Z', fill: 'currentColor',
@@ -437,6 +443,7 @@ function pintarIntentos() {
     const punto = document.createElement('span');
     const i = intentos[n];
     punto.className = 'intento' + (i ? (i.acierto ? ' intento--acierto' : ' intento--fallo') : '');
+    if (i && !i.acierto) punto.dataset.temperatura = claveTemperatura(i.temperatura);
     caja.appendChild(punto);
   }
   const quedan = CONFIG.INTENTOS - intentos.length;
@@ -461,7 +468,7 @@ function pintarMapa(animar) {
 
     // Flecha de pista junto al nombre de los lugares fallados
     if (intento && !intento.acierto && !etiqueta.querySelector('.flecha')) {
-      const flecha = crearFlecha(intento.rumbo);
+      const flecha = crearFlecha(intento.rumbo, intento.temperatura);
       if (!animar) flecha.style.animation = 'none';
       etiqueta.appendChild(flecha);
       etiqueta.setAttribute('aria-label', `${LUGARES[codigo].nombre}: ${intento.temperatura}, hacia el ${nombreRumbo(intento.rumbo)}`);
@@ -471,8 +478,12 @@ function pintarMapa(animar) {
   mostrarBocadillo();
 }
 
-function pintarPista() {
+// Giro acumulado de la flecha de la brújula, para que gire por el camino más corto.
+let giroBrujula = null;
+
+function pintarPista(animar) {
   const pista = $('pista');
+  const tarjeta = $('pista-tarjeta');
   const ultimo = intentos[intentos.length - 1];
   const fallos = intentos.filter((i) => !i.acierto).length;
 
@@ -490,6 +501,15 @@ function pintarPista() {
   if (terminada) return;
 
   pista.replaceChildren();
+  const conTarjeta = !palabraTerminada && !!ultimo;
+  pista.hidden = conTarjeta;
+  tarjeta.hidden = !conTarjeta;
+  if (!conTarjeta) {
+    // Al ocultarse, la brújula vuelve al norte para que la próxima flecha gire desde ahí.
+    giroBrujula = null;
+    $('pista-flecha').style.transition = 'none';
+    $('pista-flecha').style.transform = 'rotate(0deg)';
+  }
 
   // Palabra acabada (y quedan más): solución y botón para seguir.
   if (palabraTerminada) {
@@ -503,11 +523,41 @@ function pintarPista() {
     pista.textContent = 'Toca en el mapa un lugar donde se diga esta palabra.';
     return;
   }
-  // «México: frío. → Más cerca hacia el sureste.»
-  const temperatura = document.createElement('strong');
-  temperatura.textContent = ultimo.temperatura[0].toUpperCase() + ultimo.temperatura.slice(1);
-  pista.append(`${LUGARES[ultimo.codigo].nombre}: `, temperatura, '. ', crearFlecha(ultimo.rumbo),
-    ` Prueba hacia el ${nombreRumbo(ultimo.rumbo)}.`);
+  pintarTarjetaPista(ultimo, intentos[intentos.length - 2], animar);
+}
+
+// Tarjeta tras un fallo: brújula hacia el lugar correcto más cercano, temperatura
+// con termómetro y, desde el segundo fallo, si te acercas o te alejas.
+function pintarTarjetaPista(ultimo, anterior, animar) {
+  const tarjeta = $('pista-tarjeta');
+  tarjeta.dataset.temperatura = claveTemperatura(ultimo.temperatura);
+
+  // La flecha gira desde donde estaba por el camino más corto.
+  const flecha = $('pista-flecha');
+  const nuevo = giroBrujula === null ? 0 : giroBrujula;
+  giroBrujula = nuevo + ((((ultimo.rumbo - nuevo) % 360) + 540) % 360) - 180;
+  flecha.style.transition = animar ? '' : 'none';
+  if (animar) void flecha.getBoundingClientRect(); // fija el giro de partida antes de girar
+  flecha.style.transform = `rotate(${Math.round(giroBrujula)}deg)`;
+
+  $('pista-temperatura').textContent = ultimo.temperatura;
+  $('pista-rumbo').textContent = `Prueba hacia el ${nombreRumbo(ultimo.rumbo)}`;
+
+  const lugar = LUGARES[ultimo.codigo].nombre;
+  let detalle = `Desde ${lugar}`;
+  if (anterior && !anterior.acierto) {
+    const diferencia = ultimo.km - anterior.km;
+    if (diferencia < -CONFIG.MARGEN_KM) detalle += ' · 🔥 te acercas';
+    else if (diferencia > CONFIG.MARGEN_KM) detalle += ' · ❄️ te alejas';
+    else detalle += ' · igual de lejos';
+  }
+  $('pista-detalle').textContent = detalle;
+
+  if (animar) {
+    tarjeta.classList.remove('pista--nueva');
+    void tarjeta.offsetWidth; // reinicia la animación
+    tarjeta.classList.add('pista--nueva');
+  }
 }
 
 const ORDINALES = ['a la primera', 'al segundo intento', 'al tercer intento'];
@@ -620,15 +670,17 @@ function pintarResultado() {
 function pintar(animar = false) {
   pintarIntentos();
   pintarMapa(animar);
-  pintarPista();
+  pintarPista(animar);
   pintarResultado();
 }
 
 /* ---------- Compartir ---------- */
 
+const CUADROS = { frio: '🟦', templado: '🟧', caliente: '🟥' };
+
 function textoCompartir() {
   const lineas = rondas.map((lista) => {
-    const cuadros = lista.map((i) => (i.acierto ? '🟩' : i.temperatura === 'frío' ? '🟥' : '🟧')).join('');
+    const cuadros = lista.map((i) => (i.acierto ? '🟩' : CUADROS[claveTemperatura(i.temperatura)])).join('');
     const acierto = lista.some((i) => i.acierto);
     return `${cuadros}  ${acierto ? lista.length : 'X'}/${CONFIG.INTENTOS}`;
   });

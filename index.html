@@ -68,6 +68,22 @@
            (el lugar elegido se confirma con el bocadillo que sale en el mapa) -->
       <div class="barra" id="barra">
         <p class="barra__pista" id="pista">Toca en el mapa un lugar donde se diga esta palabra.</p>
+        <!-- Tarjeta de pista tras un fallo: brújula, temperatura y si te acercas -->
+        <div class="pista" id="pista-tarjeta" hidden>
+          <div class="pista__brujula" aria-hidden="true">
+            <svg class="pista__flecha" id="pista-flecha" viewBox="0 0 20 20">
+              <path d="M10 2 L16 10 H12 V18 H8 V10 H4 Z" fill="currentColor" />
+            </svg>
+          </div>
+          <div class="pista__texto">
+            <p class="pista__temperatura">
+              <span id="pista-temperatura"></span>
+              <span class="termometro" aria-hidden="true"><i></i><i></i><i></i></span>
+            </p>
+            <p class="pista__rumbo" id="pista-rumbo"></p>
+            <p class="pista__detalle" id="pista-detalle"></p>
+          </div>
+        </div>
         <button class="boton boton--principal" id="boton-siguiente" type="button" hidden>Siguiente palabra</button>
       </div>
 
@@ -99,7 +115,7 @@
     <p>Con cada una, <strong>toca en el mapa un lugar donde se diga</strong> y confirma. Si se usa en varios sitios, vale cualquiera. Tienes <strong>tres intentos por palabra</strong>.</p>
     <h3 class="subtitulo">Pistas</h3>
     <ul class="dialogo__lista">
-      <li><strong>Al primer fallo</strong>, una flecha señala hacia el lugar correcto más cercano y te dice si estás <em>caliente</em> (a menos de 1.500 km), <em>templado</em> (a menos de 4.000 km) o <em>frío</em>.</li>
+      <li><strong>Al primer fallo</strong>, una flecha señala hacia el lugar correcto más cercano y te dice si estás <em>caliente</em> (a menos de 1.500 km), <em>templado</em> (a menos de 4.000 km) o <em>frío</em>. Desde el segundo fallo, también te dice si <em>te acercas</em> o <em>te alejas</em>.</li>
       <li><strong>Al segundo fallo</strong>, se desvela la región: Caribe, Andes, Cono Sur…</li>
       <li><strong>Al tercero</strong>, verás la solución y pasarás a la siguiente palabra.</li>
     </ul>

@@ -9,6 +9,11 @@
   --linea: #B9A88A;     /* líneas suaves */
   --acento: #A33A2A;    /* rojo teja: aciertos, solución, botones principales */
 
+  /* Temperatura de las pistas */
+  --frio: #3F6A8A;      /* azul tinta apagado */
+  --templado: #C08A2E;  /* ocre */
+  --caliente: var(--acento);
+
   --titulos: 'IM Fell English', Georgia, 'Times New Roman', serif;
   --texto: 'EB Garamond', Georgia, 'Times New Roman', serif;
   --radio: 10px;
@@ -240,6 +245,9 @@ button { font: inherit; color: inherit; }
 
 .intento--fallo { background: var(--tinta); }
 .intento--acierto { background: var(--acento); border-color: var(--acento); }
+.intento[data-temperatura="frio"] { background: var(--frio); border-color: var(--frio); }
+.intento[data-temperatura="templado"] { background: var(--templado); border-color: var(--templado); }
+.intento[data-temperatura="caliente"] { background: var(--caliente); border-color: var(--caliente); }
 
 /* ---------- Mapa ---------- */
 
@@ -440,6 +448,13 @@ button { font: inherit; color: inherit; }
   animation: fundido .5s ease both;
 }
 
+/* Color de la temperatura: flechas del mapa y tarjeta de pista */
+[data-temperatura="frio"] { --temperatura: var(--frio); }
+[data-temperatura="templado"] { --temperatura: var(--templado); }
+[data-temperatura="caliente"] { --temperatura: var(--caliente); }
+
+.flecha[data-temperatura] { color: var(--temperatura); }
+
 /* Bocadillo para confirmar junto al lugar elegido */
 .bocadillo {
   position: absolute;
@@ -511,6 +526,96 @@ button { font: inherit; color: inherit; }
   display: inline-block;
   vertical-align: -2px;
   margin: 0 2px;
+}
+
+/* Tarjeta de pista tras un fallo */
+.pista {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  background: var(--papel);
+  border: 1px solid var(--linea);
+  border-left: 5px solid var(--temperatura, var(--linea));
+  border-radius: var(--radio);
+}
+
+.pista--nueva { animation: aparece-pista .35s ease both; }
+
+@keyframes aparece-pista {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Brújula con la flecha hacia el lugar correcto más cercano */
+.pista__brujula {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid var(--temperatura, var(--linea));
+  border-radius: 50%;
+  background: var(--fondo);
+}
+
+/* Marca del norte */
+.pista__brujula::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  width: 2px;
+  height: 6px;
+  margin-left: -1px;
+  background: var(--linea);
+}
+
+.pista__flecha {
+  width: 26px;
+  height: 26px;
+  color: var(--temperatura, var(--tinta));
+  transition: transform .6s cubic-bezier(.3, 1.4, .5, 1);
+}
+
+.pista__texto { min-width: 0; }
+
+.pista__texto p { margin: 0; }
+
+.pista__temperatura {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--temperatura, var(--tinta));
+  font-weight: 600;
+  font-variant: small-caps;
+  text-transform: lowercase;
+  letter-spacing: .06em;
+  font-size: 1.15rem;
+  line-height: 1.1;
+}
+
+/* Termómetro de tres segmentos: frío llena uno, templado dos, caliente tres */
+.termometro { display: inline-flex; gap: 3px; }
+
+.termometro i {
+  width: 10px;
+  height: 7px;
+  border: 1px solid var(--temperatura, var(--linea));
+  border-radius: 2px;
+  transition: background-color .3s ease;
+}
+
+[data-temperatura="frio"] .termometro i:nth-child(-n+1),
+[data-temperatura="templado"] .termometro i:nth-child(-n+2),
+[data-temperatura="caliente"] .termometro i { background: var(--temperatura); }
+
+.pista__rumbo { font-size: 1.05rem; }
+
+.pista__detalle {
+  color: rgba(43, 36, 32, .7);
+  font-size: .9rem;
 }
 
 /* ---------- Resultado ---------- */
