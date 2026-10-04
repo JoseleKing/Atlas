@@ -757,9 +757,19 @@ function retirarPortada() {
 
 /* ---------- Almanaque ---------- */
 
-// Avisa a Almanaque (si se llegó desde allí) de que la partida de hoy está hecha.
+// Avisa a Almanaque de que la partida de hoy está hecha, con los aciertos y la racha
+// para la hoja de Atlas.
 function avisarAlmanaque() {
-  if (!modoPrueba && window.almanaqueHecho) window.almanaqueHecho();
+  if (modoPrueba) return;
+  const avisar = () => window.almanaqueHecho?.({
+    aciertos: acertadas(),
+    total: dia.length,
+    racha: rachaActual(),
+  });
+  // Este script corre antes que volver-almanaque.js (que lleva defer): si aún no existe,
+  // se espera a DOMContentLoaded, que llega después de los scripts con defer.
+  if (window.almanaqueHecho) avisar();
+  else document.addEventListener('DOMContentLoaded', avisar, { once: true });
 }
 
 /* ---------- Arranque ---------- */
