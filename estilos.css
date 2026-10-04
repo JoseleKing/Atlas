@@ -499,6 +499,30 @@ button { font: inherit; color: inherit; }
   to { opacity: 1; }
 }
 
+/* Botón «Siguiente palabra», en el centro del mapa al acabar cada palabra */
+.mapa__siguiente {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  min-height: 54px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  touch-action: manipulation;
+  box-shadow: 0 0 0 4px var(--papel), 0 6px 18px rgba(43, 36, 32, .35);
+  animation: aparecer-siguiente .35s ease-out;
+}
+
+.mapa__siguiente[hidden] { display: none; }
+
+@keyframes aparecer-siguiente {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(.85); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
 /* ---------- Barra de elección ---------- */
 
 .barra {

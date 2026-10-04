@@ -511,7 +511,7 @@ function pintarPista(animar) {
     $('pista-flecha').style.transform = 'rotate(0deg)';
   }
 
-  // Palabra acabada (y quedan más): solución y botón para seguir.
+  // Palabra acabada (y quedan más): solución (el botón para seguir sale en el mapa).
   if (palabraTerminada) {
     const veredicto = document.createElement('strong');
     veredicto.textContent = ultimo.acierto ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'No ha podido ser.';
