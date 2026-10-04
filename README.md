@@ -57,8 +57,8 @@ Cada palabra:
   se vuelve a empezar. Añade los nuevos **al final** para no cambiar los ya jugados.
   El primer día (`guagua`) es de cuando Atlas tenía una sola palabra; el juego admite
   días con cualquier número de palabras.
-- Se gana el día (y sube la racha) acertando todas sus palabras. «Aciertos» es el
-  porcentaje de palabras acertadas.
+- La racha cuenta los días seguidos en que se termina la partida, se acierte o no,
+  y se pierde al saltarse un día. «Aciertos» es el porcentaje de palabras acertadas.
 
 ## El mapa
 

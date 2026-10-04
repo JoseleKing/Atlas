@@ -58,7 +58,8 @@ function datosVacios() {
   return {
     ayudaVista: false,
     partida: null, // { numero, ronda, rondas: [[códigos de lugar] por palabra], terminada }
-    // jugadas y ganadas cuentan días (se gana el día acertando todas sus palabras);
+    // jugadas y ganadas cuentan días (se gana el día acertando todas sus palabras; la racha
+    // cuenta días seguidos jugando, se gane o no);
     // palabras y acertadas cuentan palabras sueltas.
     stats: { jugadas: 0, ganadas: 0, palabras: 0, acertadas: 0, racha: 0, mejor: 0, ultimoGanado: null, ultimoJugado: null },
   };
@@ -406,14 +407,13 @@ function registrarEstadisticas() {
   s.jugadas += 1;
   s.palabras += dia.length;
   s.acertadas += aciertos;
+  // La racha cuenta los días seguidos en que se termina la partida, se acierte o no.
+  s.racha = s.ultimoJugado === numero - 1 ? s.racha + 1 : 1;
+  s.mejor = Math.max(s.mejor, s.racha);
   s.ultimoJugado = numero;
   if (aciertos === dia.length) {
     s.ganadas += 1;
-    s.racha = s.ultimoGanado === numero - 1 ? s.racha + 1 : 1;
     s.ultimoGanado = numero;
-    s.mejor = Math.max(s.mejor, s.racha);
-  } else {
-    s.racha = 0;
   }
 }
 
@@ -422,10 +422,10 @@ function acertadas() {
   return rondas.filter((l) => l.some((i) => i.acierto)).length;
 }
 
-// La racha (días seguidos acertando todas las palabras) se pierde si ayer no se acertaron.
+// La racha (días seguidos jugando) se pierde si ayer no se terminó la partida.
 function rachaActual() {
   const s = datos.stats;
-  return s.ultimoGanado !== null && s.ultimoGanado >= hoy - 1 ? s.racha : 0;
+  return s.ultimoJugado !== null && s.ultimoJugado >= hoy - 1 ? s.racha : 0;
 }
 
 /* ---------- Pintar el estado ---------- */
