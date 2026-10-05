@@ -373,7 +373,7 @@ button { font: inherit; color: inherit; }
   background: none;
   color: var(--tinta);
   font-family: var(--texto);
-  font-size: clamp(10px, 3cqi, 12.5px);
+  font-size: clamp(11px, 3.3cqi, 13px);
   font-weight: 500;
   font-variant: small-caps;
   letter-spacing: .05em;
@@ -429,6 +429,16 @@ button { font: inherit; color: inherit; }
 
 .etiqueta:disabled:not([data-estado]) { cursor: default; }
 
+/* Los nombres que ya no se pueden elegir dejan pasar el toque a los vecinos */
+.etiqueta:disabled { pointer-events: none; }
+
+/* Lugares entre los que pregunta el bocadillo «¿Cuál?» */
+.etiqueta--candidata .etiqueta__nombre {
+  background: var(--papel);
+  border-color: var(--acento);
+  border-style: dashed;
+}
+
 /* Al terminar, los lugares que no son la respuesta quedan en segundo plano */
 .mapa--terminado .etiqueta:not([data-estado]) { opacity: .5; }
 
@@ -455,23 +465,51 @@ button { font: inherit; color: inherit; }
 
 .flecha[data-temperatura] { color: var(--temperatura); }
 
-/* Bocadillo para confirmar junto al lugar elegido */
+/* Bocadillo junto al lugar elegido: «Elegir…» o, si el toque cae entre
+   varios lugares, «¿Cuál?» con un botón por lugar */
 .bocadillo {
   position: absolute;
   z-index: 1;
-  min-height: 36px;
-  padding: 6px 14px;
+  display: flex;
+  align-items: center;
   border: 1px solid var(--acento);
   border-radius: 999px;
   background: var(--acento);
+  box-shadow: 0 2px 6px rgba(43, 36, 32, .25);
+  animation: fundido .2s ease both;
+}
+
+.bocadillo__boton {
+  min-height: 36px;
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: none;
   color: var(--papel);
+  font-family: inherit;
   font-size: .95rem;
   line-height: 1.1;
   white-space: nowrap;
   cursor: pointer;
   touch-action: manipulation;
-  box-shadow: 0 2px 6px rgba(43, 36, 32, .25);
-  animation: fundido .2s ease both;
+}
+
+.bocadillo--opciones {
+  gap: 4px;
+  padding: 3px;
+  background: var(--papel);
+}
+
+.bocadillo__pregunta {
+  padding: 0 4px 0 8px;
+  font-size: .95rem;
+  white-space: nowrap;
+}
+
+.bocadillo--opciones .bocadillo__boton {
+  min-height: 38px;
+  padding: 6px 11px;
+  background: var(--acento);
 }
 
 /* Pico que señala el nombre elegido */
@@ -492,7 +530,10 @@ button { font: inherit; color: inherit; }
   border-bottom-color: var(--acento);
 }
 
-.bocadillo:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
+.bocadillo--opciones::after { border-top-color: var(--acento); }
+.bocadillo--opciones.bocadillo--debajo::after { border-top-color: transparent; }
+
+.bocadillo__boton:focus-visible { outline: 2px solid var(--tinta); outline-offset: 2px; }
 
 @keyframes fundido {
   from { opacity: 0; }

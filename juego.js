@@ -111,6 +111,7 @@ let intentos = [];       // rondas[ronda]
 let palabraTerminada = false;
 let terminada = false;   // todas las palabras del día jugadas
 let seleccion = null;    // código del lugar elegido y aún no confirmado
+let opciones = null;     // { lugares, x, y } si un toque cae entre varios lugares (x, y: fracción del mapa)
 let temporizador = null;
 
 const $ = (id) => document.getElementById(id);
@@ -228,7 +229,6 @@ function dibujarMapa() {
     for (const [codigo, d] of Object.entries(trazados)) {
       if (!LUGARES[codigo]) continue;
       const pais = elementoSvg('path', { class: 'pais', d, 'data-codigo': codigo });
-      pais.addEventListener('click', () => elegir(codigo));
       (siluetas[codigo] ||= []).push(pais);
       destino.appendChild(pais);
     }
@@ -271,7 +271,6 @@ function dibujarMapa() {
     nombre.textContent = lugar.corto || lugar.nombre;
     boton.appendChild(nombre);
 
-    boton.addEventListener('click', () => elegir(codigo));
     // Al pasar el ratón por el nombre, se resalta también el país
     boton.addEventListener('mouseenter', () => (siluetas[codigo] || []).forEach((p) => p.classList.add('pais--encima')));
     boton.addEventListener('mouseleave', () => (siluetas[codigo] || []).forEach((p) => p.classList.remove('pais--encima')));
@@ -279,16 +278,22 @@ function dibujarMapa() {
     mapa.appendChild(boton);
   }
 
-  // Bocadillo para confirmar junto al lugar elegido: así se ve aunque se haya
+  // Bocadillo junto al lugar elegido, para confirmarlo (o para escoger entre
+  // varios lugares si el toque cae entre ellos): así se ve aunque se haya
   // ampliado la pantalla con los dedos y la barra de abajo quede fuera de la vista.
-  const bocadillo = document.createElement('button');
-  bocadillo.type = 'button';
+  const bocadillo = document.createElement('div');
   bocadillo.id = 'bocadillo';
   bocadillo.className = 'bocadillo';
   bocadillo.hidden = true;
-  bocadillo.addEventListener('click', confirmar);
+  // Sus botones se rehacen al tocarlos: que ese toque no llegue al mapa.
+  bocadillo.addEventListener('click', (e) => e.stopPropagation());
   mapa.appendChild(bocadillo);
   new ResizeObserver(() => { if (!bocadillo.hidden) colocarBocadillo(); }).observe(mapa);
+
+  // El navegador puede mover el clic de un toque hacia el botón más cercano;
+  // se guarda dónde cayó de verdad el dedo.
+  mapa.addEventListener('pointerdown', (e) => { puntoToque = { x: e.clientX, y: e.clientY }; });
+  mapa.addEventListener('click', tocarMapa);
 }
 
 /* ---------- Interacción ---------- */
@@ -309,9 +314,78 @@ function destello(codigo) {
   nombre.classList.add('destello');
 }
 
+// Radio (px) alrededor del dedo en el que se buscan lugares, para que no haga
+// falta ampliar la pantalla para acertar con los países pequeños.
+const RADIO_TOQUE = 14;
+let puntoToque = null;
+
+// Toque en el mapa: si cae sobre un nombre o no hay dudas, se elige ese lugar;
+// si cae entre varios, el bocadillo pregunta cuál.
+function tocarMapa(evento) {
+  if (palabraTerminada || evento.target.closest('.mapa__siguiente')) return;
+
+  // Con el teclado (Intro o espacio sobre un nombre) no hay punto que mirar.
+  if (evento.detail === 0) {
+    const boton = evento.target.closest('.etiqueta');
+    if (boton) elegir(boton.dataset.codigo);
+    return;
+  }
+
+  const { x, y } = puntoToque || { x: evento.clientX, y: evento.clientY };
+  puntoToque = null;
+  const candidatos = lugaresCerca(x, y);
+  if (candidatos.length === 1) elegir(candidatos[0]);
+  else if (candidatos.length > 1) preguntar(candidatos, x, y);
+  else if (opciones) cerrarOpciones();
+}
+
+// Lugares que se pueden elegir alrededor de un punto de la pantalla, del más
+// probable al menos. Un toque de lleno sobre el texto de un nombre no deja dudas.
+function lugaresCerca(x, y) {
+  const libre = (c) => c && !intentos.some((i) => i.codigo === c);
+  const nombreEn = (px, py) => {
+    const el = document.elementsFromPoint(px, py).find((e) => e.classList.contains('etiqueta__nombre'));
+    return el && libre(el.parentElement.dataset.codigo) ? el.parentElement.dataset.codigo : null;
+  };
+  const enCentro = document.elementsFromPoint(x, y);
+  const nombre = nombreEn(x, y);
+  const cerca = [[0, -8], [0, 8], [-8, 0], [8, 0]].map(([dx, dy]) => nombreEn(x + dx, y + dy));
+  if (nombre && cerca.every((c) => !c || c === nombre)) return [nombre];
+
+  // Un toque de lleno en un lugar ya probado no elige a su vecino.
+  const debajo = enCentro.find((el) => el.matches('.pais, .etiqueta'));
+  if (debajo && !libre(debajo.dataset.codigo)) return [];
+
+  // Puntos: 4 por el centro y 1 por cada punto del anillo que toca el lugar.
+  const puntos = new Map();
+  const sumar = (c, n) => { if (libre(c)) puntos.set(c, (puntos.get(c) || 0) + n); };
+  const lugarDe = (el) => (el.classList.contains('pais') ? el.dataset.codigo
+    : el.classList.contains('etiqueta__nombre') ? el.parentElement.dataset.codigo : null);
+
+  const vistos = new Set();
+  for (const el of enCentro) {
+    // La zona de toque del botón (más grande que el texto) solo cuenta en el centro.
+    const c = lugarDe(el) || (el.classList.contains('etiqueta') ? el.dataset.codigo : null);
+    if (c && !vistos.has(c)) { vistos.add(c); sumar(c, 4); }
+  }
+  for (let k = 0; k < 8; k++) {
+    const a = (k * Math.PI) / 4;
+    const anillo = new Set(document.elementsFromPoint(x + RADIO_TOQUE * Math.cos(a), y + RADIO_TOQUE * Math.sin(a))
+      .map(lugarDe).filter(Boolean));
+    for (const c of anillo) sumar(c, 1);
+  }
+
+  // Si el dedo está dentro de un país, los vecinos que apenas asoman en el anillo no cuentan.
+  const orden = [...puntos.entries()].sort((a, b) => b[1] - a[1]);
+  const minimo = orden.length && orden[0][1] >= 4 ? 3 : 1;
+  return orden.filter(([, n]) => n >= minimo).slice(0, 3).map(([c]) => c);
+}
+
 // Primer toque: se elige el lugar (hay que confirmarlo con el botón).
 function elegir(codigo) {
   if (palabraTerminada || intentos.some((i) => i.codigo === codigo)) return;
+  quitarCandidatos();
+  opciones = null;
   if (seleccion) marcar(seleccion, '');
   seleccion = codigo;
   marcar(codigo, 'elegido');
@@ -319,20 +393,68 @@ function elegir(codigo) {
   mostrarBocadillo();
 }
 
+// El toque cae entre varios lugares: se resaltan y el bocadillo pregunta cuál.
+function preguntar(candidatos, x, y) {
+  if (seleccion) marcar(seleccion, '');
+  seleccion = null;
+  quitarCandidatos();
+  const caja = $('mapa').getBoundingClientRect();
+  opciones = { lugares: candidatos, x: (x - caja.left) / caja.width, y: (y - caja.top) / caja.height };
+  for (const c of candidatos) etiquetas[c].classList.add('etiqueta--candidata');
+  mostrarBocadillo();
+}
+
+function cerrarOpciones() {
+  opciones = null;
+  quitarCandidatos();
+  mostrarBocadillo();
+}
+
+function quitarCandidatos() {
+  for (const e of Object.values(etiquetas)) e.classList.remove('etiqueta--candidata');
+}
+
 function mostrarBocadillo() {
   const bocadillo = $('bocadillo');
-  bocadillo.hidden = !seleccion || palabraTerminada;
+  bocadillo.hidden = (!seleccion && !opciones) || palabraTerminada;
   if (bocadillo.hidden) return;
-  bocadillo.textContent = `Elegir ${LUGARES[seleccion].nombre}`;
+
+  const boton = (texto, accion) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'bocadillo__boton';
+    b.textContent = texto;
+    b.addEventListener('click', accion);
+    return b;
+  };
+  bocadillo.classList.toggle('bocadillo--opciones', !!opciones);
+  if (opciones) {
+    const pregunta = document.createElement('span');
+    pregunta.className = 'bocadillo__pregunta';
+    pregunta.textContent = '¿Cuál?';
+    bocadillo.replaceChildren(pregunta, ...opciones.lugares.map((c) =>
+      boton(LUGARES[c].corto || LUGARES[c].nombre, () => elegir(c))));
+  } else {
+    bocadillo.replaceChildren(boton(`Elegir ${LUGARES[seleccion].nombre}`, confirmar));
+  }
   colocarBocadillo();
 }
 
-// Encima del nombre elegido (o debajo, si arriba no cabe), sin salirse del mapa.
+// Encima del nombre elegido o del punto tocado (o debajo, si arriba no cabe),
+// sin salirse del mapa.
 function colocarBocadillo() {
   const mapa = $('mapa');
   const bocadillo = $('bocadillo');
   const caja = mapa.getBoundingClientRect();
-  const nombre = etiquetas[seleccion].querySelector('.etiqueta__nombre').getBoundingClientRect();
+  let nombre;
+  if (opciones) {
+    // Un poco por encima y por debajo del dedo, para no taparlo.
+    const x = caja.left + opciones.x * caja.width;
+    const y = caja.top + opciones.y * caja.height;
+    nombre = { left: x, width: 0, top: y - 16, bottom: y + 16 };
+  } else {
+    nombre = etiquetas[seleccion].querySelector('.etiqueta__nombre').getBoundingClientRect();
+  }
   const margen = 6;
   const ancho = bocadillo.offsetWidth;
   const alto = bocadillo.offsetHeight;
@@ -389,6 +511,8 @@ function ponerRonda(r) {
   intentos = rondas[r];
   palabraTerminada = acabada(intentos);
   seleccion = null;
+  opciones = null;
+  quitarCandidatos();
 }
 
 // Guardar la partida en curso (así, si se recarga, no se puede volver a empezar).
