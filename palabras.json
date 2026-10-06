@@ -268,5 +268,759 @@
       "equivalentes": { "España": "resaca", "México": "cruda", "Chile": "caña" },
       "curiosidad": "En Colombia también es la nostalgia que deja una ruptura amorosa."
     }
+  ],
+  [
+    {
+      "palabra": "birome",
+      "significado": "bolígrafo",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "boli", "México": "pluma", "Colombia": "esfero" },
+      "curiosidad": "Viene de Ladislao Biro, el inventor húngaro que patentó el bolígrafo moderno en Argentina en los años cuarenta."
+    },
+    {
+      "palabra": "guajolote",
+      "significado": "pavo",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "pavo", "Guatemala": "chompipe" },
+      "curiosidad": "Viene del náhuatl «huexōlōtl». En México, además, llamar a alguien «guajolote» es decirle tonto."
+    },
+    {
+      "palabra": "vale",
+      "significado": "de acuerdo",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "órale", "Argentina": "dale", "Colombia": "listo" },
+      "curiosidad": "En España sirve para casi todo: aceptar, cerrar una conversación o pedir calma («vale, vale»)."
+    }
+  ],
+  [
+    {
+      "palabra": "cuy",
+      "significado": "cobaya",
+      "lugares": ["PE", "EC", "BO", "CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "cobaya", "Argentina": "cuis" },
+      "curiosidad": "En los Andes se cría para comerlo desde hace miles de años. En la «Última Cena» de la catedral de Cusco, Jesús y los apóstoles tienen un cuy en la mesa."
+    },
+    {
+      "palabra": "laburo",
+      "significado": "trabajo",
+      "lugares": ["AR", "UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "curro", "México": "chamba", "Chile": "pega" },
+      "curiosidad": "Llegó con los inmigrantes italianos al lunfardo de Buenos Aires: viene de «lavoro»."
+    },
+    {
+      "palabra": "coche",
+      "significado": "cerdo",
+      "lugares": ["GT"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "cerdo", "Argentina": "chancho", "Colombia": "marrano" },
+      "curiosidad": "Se suele explicar por la voz con que se llama a los cerdos, «¡coche, coche!». En España, en cambio, un coche es un automóvil."
+    }
+  ],
+  [
+    {
+      "palabra": "curro",
+      "significado": "trabajo",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "Argentina": "laburo", "México": "chamba", "Chile": "pega" },
+      "curiosidad": "De ahí sale «currar», trabajar. En Andalucía, en cambio, Curro es el diminutivo de Francisco."
+    },
+    {
+      "palabra": "escuincle",
+      "significado": "niño",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "crío", "Argentina": "pibe", "Chile": "cabro chico" },
+      "curiosidad": "Viene del náhuatl «itzcuintli», «perro», y en concreto del perro sin pelo mexicano, el xoloitzcuintle."
+    },
+    {
+      "palabra": "pollera",
+      "significado": "falda",
+      "lugares": ["AR", "UY", "PY", "CL", "BO"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "falda", "México": "falda" },
+      "curiosidad": "En Panamá, la pollera es el traje típico femenino, bordado con mucho trabajo."
+    }
+  ],
+  [
+    {
+      "palabra": "tuanis",
+      "significado": "estupendo, genial",
+      "lugares": ["CR"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "guay", "México": "chido", "Argentina": "copado" },
+      "curiosidad": "Se suele explicar como una deformación del inglés «too nice»."
+    },
+    {
+      "palabra": "parcero",
+      "significado": "amigo",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "colega", "México": "cuate", "Venezuela": "pana" },
+      "curiosidad": "Nació en el habla de Medellín y se ha extendido por todo el país; se abrevia «parce»."
+    },
+    {
+      "palabra": "guineo",
+      "significado": "plátano, banana",
+      "lugares": ["PR", "DO", "EC", "PA", "SV", "HN"],
+      "region": "Caribe",
+      "equivalentes": { "España": "plátano", "Venezuela": "cambur", "Argentina": "banana" },
+      "curiosidad": "Por Guinea, en África, de donde se creía que procedía la fruta."
+    }
+  ],
+  [
+    {
+      "palabra": "pucho",
+      "significado": "cigarrillo",
+      "lugares": ["AR", "UY", "CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "pitillo", "México": "cigarro" },
+      "curiosidad": "Viene del quechua «puchu», «sobrante»: al principio era la colilla, lo que queda del cigarro."
+    },
+    {
+      "palabra": "lana",
+      "significado": "dinero",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "pasta", "Argentina": "guita", "Puerto Rico": "chavos" },
+      "curiosidad": "Se usa sobre todo en frases como «no tengo lana» o «cuesta mucha lana»."
+    },
+    {
+      "palabra": "pijo",
+      "significado": "de clase alta y presumido",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "fresa", "Argentina": "cheto", "Chile": "cuico", "Venezuela": "sifrino" },
+      "curiosidad": "Cada país tiene su palabra para el niño bien: en Colombia es «gomelo», y en Perú, «pituco»."
+    }
+  ],
+  [
+    {
+      "palabra": "chancho",
+      "significado": "cerdo",
+      "lugares": ["AR", "CL", "PE", "BO", "EC", "UY", "PY"],
+      "region": "Andes",
+      "equivalentes": { "España": "cerdo", "Guatemala": "coche", "Colombia": "marrano" },
+      "curiosidad": "Se usa también como insulto cariñoso para alguien sucio o glotón: «¡qué chancho!»."
+    },
+    {
+      "palabra": "cipote",
+      "significado": "niño, chaval",
+      "lugares": ["HN", "SV", "NI"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "chaval", "México": "escuincle", "Argentina": "pibe" },
+      "curiosidad": "En Centroamérica es una palabra corriente; en España, en cambio, es malsonante."
+    },
+    {
+      "palabra": "vaina",
+      "significado": "cosa, asunto",
+      "lugares": ["VE", "CO", "DO", "PA"],
+      "region": "Caribe",
+      "equivalentes": { "España": "cosa", "Chile": "cuestión" },
+      "curiosidad": "Sirve para casi todo: «pásame esa vaina», «¡qué vaina!» (qué contratiempo)."
+    }
+  ],
+  [
+    {
+      "palabra": "esfero",
+      "significado": "bolígrafo",
+      "lugares": ["CO", "EC"],
+      "region": "Andes",
+      "equivalentes": { "España": "boli", "Argentina": "birome", "México": "pluma" },
+      "curiosidad": "Es un acortamiento de «esferográfico», por la bolita de la punta."
+    },
+    {
+      "palabra": "alberca",
+      "significado": "piscina",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "piscina", "Argentina": "pileta" },
+      "curiosidad": "Viene del árabe «al-birka», el estanque. En España, una alberca es un depósito de agua para regar."
+    },
+    {
+      "palabra": "gurí",
+      "significado": "niño, chico",
+      "lugares": ["UY", "AR"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "chaval", "México": "escuincle", "Chile": "cabro" },
+      "curiosidad": "Viene del guaraní. Es muy uruguayo, y en Argentina se oye sobre todo en el Litoral."
+    }
+  ],
+  [
+    {
+      "palabra": "pata",
+      "significado": "amigo",
+      "lugares": ["PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "colega", "Colombia": "parcero", "México": "cuate" },
+      "curiosidad": "Se usa mucho en masculino: «es mi pata», «somos patas»."
+    },
+    {
+      "palabra": "baifo",
+      "significado": "cabrito",
+      "lugares": ["ES-CN"],
+      "region": "Canarias",
+      "equivalentes": { "España": "cabrito", "México": "chivito" },
+      "curiosidad": "Es una de las voces que el español de Canarias heredó de los guanches, los antiguos pobladores de las islas."
+    },
+    {
+      "palabra": "nafta",
+      "significado": "gasolina",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "gasolina", "Chile": "bencina" },
+      "curiosidad": "Viene del griego «náphtha», un aceite mineral. En España, la nafta es otro derivado del petróleo."
+    }
+  ],
+  [
+    {
+      "palabra": "güero",
+      "significado": "rubio",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "rubio", "Venezuela": "catire", "El Salvador": "chele" },
+      "curiosidad": "Se dice también de cualquiera de piel clara, y los vendedores del mercado lo usan como apelativo: «¿qué le doy, güero?»."
+    },
+    {
+      "palabra": "colmado",
+      "significado": "tienda de comestibles del barrio",
+      "lugares": ["DO", "PR"],
+      "region": "Caribe",
+      "equivalentes": { "España": "ultramarinos", "Argentina": "almacén", "México": "tiendita" },
+      "curiosidad": "En República Dominicana es mucho más que una tienda: un punto de reunión con música y cervezas en la puerta."
+    },
+    {
+      "palabra": "zamuro",
+      "significado": "buitre negro americano",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "México": "zopilote", "Chile": "jote", "Argentina": "jote" },
+      "curiosidad": "Es el mismo pájaro que el zopilote mexicano o el gallinazo colombiano."
+    }
+  ],
+  [
+    {
+      "palabra": "boliche",
+      "significado": "discoteca",
+      "lugares": ["AR", "UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "discoteca", "México": "antro", "Chile": "disco" },
+      "curiosidad": "En España, un boliche es la bola pequeña del juego de las bochas."
+    },
+    {
+      "palabra": "pitillo",
+      "significado": "pajita para beber",
+      "lugares": ["CO", "VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "pajita", "México": "popote", "Argentina": "sorbete" },
+      "curiosidad": "En España, un pitillo es un cigarrillo."
+    },
+    {
+      "palabra": "pasta",
+      "significado": "dinero",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "lana", "Argentina": "guita", "Puerto Rico": "chavos" },
+      "curiosidad": "Una «pasta gansa» es una cantidad muy grande de dinero."
+    }
+  ],
+  [
+    {
+      "palabra": "chunche",
+      "significado": "cosa, cachivache",
+      "lugares": ["CR", "NI", "HN", "SV"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "chisme", "Venezuela": "vaina" },
+      "curiosidad": "Se usa para cualquier objeto cuyo nombre no se recuerda: «pásame ese chunche»."
+    },
+    {
+      "palabra": "micro",
+      "significado": "autobús",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "autobús", "México": "camión", "Argentina": "colectivo" },
+      "curiosidad": "Es un acortamiento de «microbús». En Santiago se usa para cualquier autobús urbano."
+    },
+    {
+      "palabra": "caraota",
+      "significado": "judía, frijol",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "judía", "México": "frijol", "Argentina": "poroto" },
+      "curiosidad": "Las caraotas negras son uno de los cuatro elementos del pabellón criollo, el plato nacional venezolano."
+    }
+  ],
+  [
+    {
+      "palabra": "camión",
+      "significado": "autobús",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "autobús", "Argentina": "colectivo", "Chile": "micro" },
+      "curiosidad": "En México se distingue entre el camión de pasajeros y el «camión de carga»."
+    },
+    {
+      "palabra": "tombo",
+      "significado": "policía",
+      "lugares": ["PE", "CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "madero", "Chile": "paco", "México": "tira" },
+      "curiosidad": "Es palabra de la jerga, algo despectiva."
+    },
+    {
+      "palabra": "heladera",
+      "significado": "nevera, frigorífico",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "frigorífico", "México": "refrigerador", "Colombia": "nevera" },
+      "curiosidad": "En otros países, una heladera es un recipiente para mantener frío algo, o el lugar donde se hacen helados."
+    }
+  ],
+  [
+    {
+      "palabra": "gafas",
+      "significado": "anteojos",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "México": "lentes", "Argentina": "anteojos" },
+      "curiosidad": "Viene de los ganchos («gafas») con que se sujetaban las primeras lentes a las orejas."
+    },
+    {
+      "palabra": "pura vida",
+      "significado": "saludo y respuesta de que todo va bien",
+      "lugares": ["CR"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "¡genial!", "México": "¡qué padre!" },
+      "curiosidad": "Es casi un lema nacional: los costarricenses la usan para saludar, despedirse o dar las gracias."
+    },
+    {
+      "palabra": "ñaño",
+      "significado": "hermano",
+      "lugares": ["EC", "PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "hermano", "México": "carnal" },
+      "curiosidad": "Se usa con mucho cariño, también entre amigos íntimos: «mi ñaño», «mi ñaña»."
+    }
+  ],
+  [
+    {
+      "palabra": "cheto",
+      "significado": "de clase alta y presumido",
+      "lugares": ["AR", "UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "pijo", "México": "fresa", "Chile": "cuico" },
+      "curiosidad": "Se suele relacionar con «concheto», una palabra más antigua del mismo sentido."
+    },
+    {
+      "palabra": "chabacano",
+      "significado": "albaricoque",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "albaricoque", "Argentina": "damasco" },
+      "curiosidad": "En España, «chabacano» significa grosero, de mal gusto."
+    },
+    {
+      "palabra": "habichuela",
+      "significado": "frijol, judía",
+      "lugares": ["PR", "DO"],
+      "region": "Caribe",
+      "equivalentes": { "España": "judía", "México": "frijol", "Venezuela": "caraota" },
+      "curiosidad": "Las habichuelas con dulce son un postre dominicano típico de la Cuaresma."
+    }
+  ],
+  [
+    {
+      "palabra": "ampolleta",
+      "significado": "bombilla",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "bombilla", "México": "foco", "Colombia": "bombillo" },
+      "curiosidad": "En España, una ampolleta es un reloj de arena pequeño."
+    },
+    {
+      "palabra": "catire",
+      "significado": "rubio",
+      "lugares": ["VE", "CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "rubio", "México": "güero", "El Salvador": "chele" },
+      "curiosidad": "Se usa también como apodo cariñoso para quien tiene el pelo claro."
+    },
+    {
+      "palabra": "ayote",
+      "significado": "calabaza",
+      "lugares": ["GT", "SV", "HN", "NI", "CR"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "calabaza", "Argentina": "zapallo", "Venezuela": "auyama" },
+      "curiosidad": "Viene del náhuatl «ayōtli»."
+    }
+  ],
+  [
+    {
+      "palabra": "regadera",
+      "significado": "ducha",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "ducha", "Argentina": "ducha" },
+      "curiosidad": "En España, una regadera es el recipiente para regar las plantas."
+    },
+    {
+      "palabra": "canilla",
+      "significado": "grifo",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "grifo", "México": "llave", "Colombia": "llave" },
+      "curiosidad": "En España, la canilla es el hueso largo de la pierna."
+    },
+    {
+      "palabra": "jato",
+      "significado": "casa",
+      "lugares": ["PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "casa", "México": "cantón" },
+      "curiosidad": "Es palabra de la jerga limeña: «vamos a mi jato»."
+    }
+  ],
+  [
+    {
+      "palabra": "paco",
+      "significado": "policía",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "madero", "Perú": "tombo", "México": "tira" },
+      "curiosidad": "Es la forma coloquial de llamar a los carabineros."
+    },
+    {
+      "palabra": "lechosa",
+      "significado": "papaya",
+      "lugares": ["VE", "DO", "PR"],
+      "region": "Caribe",
+      "equivalentes": { "España": "papaya", "Cuba": "fruta bomba" },
+      "curiosidad": "Por el líquido blanco, como leche, que suelta la fruta verde."
+    },
+    {
+      "palabra": "chiringuito",
+      "significado": "bar en la playa",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "Argentina": "parador", "México": "palapa" },
+      "curiosidad": "En sentido figurado, montar un chiringuito es crear un pequeño negocio u organismo de dudosa utilidad."
+    }
+  ],
+  [
+    {
+      "palabra": "antro",
+      "significado": "discoteca, bar nocturno",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "discoteca", "Argentina": "boliche" },
+      "curiosidad": "En España, «antro» es un local sucio y de mala fama; en México no tiene nada de malo."
+    },
+    {
+      "palabra": "grifo",
+      "significado": "gasolinera",
+      "lugares": ["PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "gasolinera", "Chile": "bencinera", "Venezuela": "bomba" },
+      "curiosidad": "En España, el grifo es la llave del agua. En Perú es por el surtidor."
+    },
+    {
+      "palabra": "championes",
+      "significado": "zapatillas de deporte",
+      "lugares": ["UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "zapatillas", "México": "tenis", "Chile": "zapatillas" },
+      "curiosidad": "Es una palabra muy uruguaya: al otro lado del Río de la Plata se dice «zapatillas»."
+    }
+  ],
+  [
+    {
+      "palabra": "fruta bomba",
+      "significado": "papaya",
+      "lugares": ["CU"],
+      "region": "Caribe",
+      "equivalentes": { "España": "papaya", "Venezuela": "lechosa" },
+      "curiosidad": "En Cuba se evita la palabra «papaya» porque allí tiene un sentido vulgar."
+    },
+    {
+      "palabra": "carrete",
+      "significado": "fiesta",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "juerga", "México": "pachanga", "Colombia": "rumba" },
+      "curiosidad": "De ahí sale «carretear», salir de fiesta."
+    },
+    {
+      "palabra": "cholas",
+      "significado": "chanclas",
+      "lugares": ["ES-CN"],
+      "region": "Canarias",
+      "equivalentes": { "España": "chanclas", "Argentina": "ojotas", "México": "chanclas" },
+      "curiosidad": "Se usa sobre todo en plural. En Venezuela también llaman cholas a las chanclas."
+    }
+  ],
+  [
+    {
+      "palabra": "banqueta",
+      "significado": "acera",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "acera", "Argentina": "vereda", "Colombia": "andén" },
+      "curiosidad": "En otros países, una banqueta es un asiento sin respaldo."
+    },
+    {
+      "palabra": "cuico",
+      "significado": "de clase alta y presumido",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "pijo", "Argentina": "cheto", "México": "fresa" },
+      "curiosidad": "Su origen es discutido. Es la palabra chilena para el niño bien."
+    },
+    {
+      "palabra": "gomelo",
+      "significado": "de clase alta y presumido",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "pijo", "Argentina": "cheto", "Chile": "cuico" },
+      "curiosidad": "Su origen no está claro, pero se oye en toda Colombia."
+    }
+  ],
+  [
+    {
+      "palabra": "ejote",
+      "significado": "judía verde",
+      "lugares": ["MX", "GT", "SV", "HN"],
+      "region": "Mesoamérica",
+      "equivalentes": { "España": "judía verde", "Argentina": "chaucha", "Chile": "poroto verde" },
+      "curiosidad": "Viene del náhuatl «exotl»."
+    },
+    {
+      "palabra": "vereda",
+      "significado": "acera",
+      "lugares": ["AR", "UY", "PY", "CL", "PE", "BO"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "acera", "México": "banqueta", "Colombia": "andén" },
+      "curiosidad": "En España, una vereda es un camino estrecho en el campo. Y en Colombia, una división rural de un municipio."
+    },
+    {
+      "palabra": "chinchorro",
+      "significado": "hamaca tejida en red",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "hamaca", "México": "hamaca" },
+      "curiosidad": "En Chile y en España, un chinchorro es una red de pesca o una barca pequeña."
+    }
+  ],
+  [
+    {
+      "palabra": "bencina",
+      "significado": "gasolina",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "gasolina", "Argentina": "nafta" },
+      "curiosidad": "En Chile, la gasolinera es la «bencinera»."
+    },
+    {
+      "palabra": "chavos",
+      "significado": "dinero",
+      "lugares": ["PR"],
+      "region": "Caribe",
+      "equivalentes": { "España": "pasta", "México": "lana", "Argentina": "guita" },
+      "curiosidad": "Viene del «ochavo», una antigua moneda de cobre. En México, en cambio, un chavo es un muchacho."
+    },
+    {
+      "palabra": "poroto",
+      "significado": "judía, frijol",
+      "lugares": ["AR", "CL", "UY", "PY", "BO", "PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "judía", "México": "frijol", "Venezuela": "caraota" },
+      "curiosidad": "Viene del quechua «purutu»."
+    }
+  ],
+  [
+    {
+      "palabra": "petaca",
+      "significado": "maleta",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "maleta", "Argentina": "valija" },
+      "curiosidad": "Viene del náhuatl «petlacalli», caja de petate. En España, una petaca es una botellita plana para licor."
+    },
+    {
+      "palabra": "pochoclo",
+      "significado": "palomitas de maíz",
+      "lugares": ["AR"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "palomitas", "Chile": "cabritas", "Colombia": "crispetas", "Venezuela": "cotufas" },
+      "curiosidad": "Pocas cosas cambian tanto de nombre de un país a otro como las palomitas."
+    },
+    {
+      "palabra": "canchita",
+      "significado": "palomitas de maíz",
+      "lugares": ["PE"],
+      "region": "Andes",
+      "equivalentes": { "España": "palomitas", "Argentina": "pochoclo", "Chile": "cabritas" },
+      "curiosidad": "La «cancha» es el maíz tostado que acompaña al ceviche; la canchita es la versión que revienta."
+    }
+  ],
+  [
+    {
+      "palabra": "crispetas",
+      "significado": "palomitas de maíz",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "palomitas", "Argentina": "pochoclo", "México": "palomitas" },
+      "curiosidad": "Por el ruido crujiente con que revientan los granos."
+    },
+    {
+      "palabra": "chinola",
+      "significado": "maracuyá",
+      "lugares": ["DO"],
+      "region": "Caribe",
+      "equivalentes": { "España": "maracuyá", "Venezuela": "parchita", "Puerto Rico": "parcha" },
+      "curiosidad": "Es la misma fruta de la pasión que en otros sitios llaman granadilla o parchita."
+    },
+    {
+      "palabra": "boli",
+      "significado": "bolígrafo",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "Argentina": "birome", "México": "pluma", "Colombia": "esfero" },
+      "curiosidad": "Es un acortamiento coloquial de «bolígrafo»."
+    }
+  ],
+  [
+    {
+      "palabra": "zapallo",
+      "significado": "calabaza",
+      "lugares": ["AR", "CL", "UY", "PE", "BO", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "calabaza", "Venezuela": "auyama", "Guatemala": "ayote" },
+      "curiosidad": "Viene del quechua «sapallu». En Argentina, el zapallito es el calabacín."
+    },
+    {
+      "palabra": "pulpería",
+      "significado": "tienda de comestibles y artículos variados",
+      "lugares": ["CR", "HN", "NI"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "ultramarinos", "República Dominicana": "colmado", "Argentina": "almacén" },
+      "curiosidad": "En el Río de la Plata, las pulperías fueron también las tabernas del campo, donde se reunían los gauchos."
+    },
+    {
+      "palabra": "jojoto",
+      "significado": "mazorca de maíz tierno",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "mazorca", "México": "elote", "Argentina": "choclo" },
+      "curiosidad": "Con el jojoto se hacen las cachapas, una especie de tortitas dulces de maíz."
+    }
+  ],
+  [
+    {
+      "palabra": "mandioca",
+      "significado": "yuca",
+      "lugares": ["AR", "PY", "UY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "yuca", "México": "yuca" },
+      "curiosidad": "Viene del guaraní. En Paraguay, la mandioca hervida acompaña casi todas las comidas."
+    },
+    {
+      "palabra": "franela",
+      "significado": "camiseta",
+      "lugares": ["VE"],
+      "region": "Andes",
+      "equivalentes": { "España": "camiseta", "México": "playera", "Argentina": "remera" },
+      "curiosidad": "En otros países, la franela es un tejido de lana; en Venezuela es la camiseta de diario."
+    },
+    {
+      "palabra": "zopilote",
+      "significado": "buitre negro americano",
+      "lugares": ["MX", "GT", "SV", "HN", "NI", "CR"],
+      "region": "Mesoamérica",
+      "equivalentes": { "Venezuela": "zamuro", "Colombia": "gallinazo", "Chile": "jote" },
+      "curiosidad": "Viene del náhuatl «tzopilotl»."
+    }
+  ],
+  [
+    {
+      "palabra": "choclo",
+      "significado": "mazorca de maíz tierno",
+      "lugares": ["AR", "CL", "PE", "BO", "EC", "UY"],
+      "region": "Andes",
+      "equivalentes": { "España": "mazorca", "México": "elote", "Venezuela": "jojoto" },
+      "curiosidad": "Viene del quechua «chuqllu». El pastel de choclo es un plato muy chileno."
+    },
+    {
+      "palabra": "órale",
+      "significado": "interjección de ánimo, asombro o acuerdo",
+      "lugares": ["MX"],
+      "region": "Norteamérica",
+      "equivalentes": { "España": "¡venga!", "Argentina": "¡dale!" },
+      "curiosidad": "Viene de «ahora», y sirve para casi todo: animar, aceptar o mostrar sorpresa."
+    },
+    {
+      "palabra": "auyama",
+      "significado": "calabaza",
+      "lugares": ["VE", "CO", "DO"],
+      "region": "Caribe",
+      "equivalentes": { "España": "calabaza", "Argentina": "zapallo", "Guatemala": "ayote" },
+      "curiosidad": "Es una voz de origen caribe."
+    }
+  ],
+  [
+    {
+      "palabra": "che",
+      "significado": "apelativo para llamar o dirigirse a alguien",
+      "lugares": ["AR", "UY", "PY"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "oye", "México": "oye, güey" },
+      "curiosidad": "Es tan argentino que se convirtió en el apodo de Ernesto Guevara: el Che. También se usa en Valencia."
+    },
+    {
+      "palabra": "cachai",
+      "significado": "¿entiendes?",
+      "lugares": ["CL"],
+      "region": "Cono Sur",
+      "equivalentes": { "España": "¿sabes?", "México": "¿me entiendes?" },
+      "curiosidad": "Viene del verbo «cachar», entender, con la conjugación propia del habla chilena."
+    },
+    {
+      "palabra": "andén",
+      "significado": "acera",
+      "lugares": ["CO"],
+      "region": "Andes",
+      "equivalentes": { "España": "acera", "Argentina": "vereda", "México": "banqueta" },
+      "curiosidad": "En España, el andén es la plataforma de una estación de tren."
+    }
+  ],
+  [
+    {
+      "palabra": "piso",
+      "significado": "apartamento, vivienda",
+      "lugares": ["ES", "ES-CN"],
+      "region": "Europa",
+      "equivalentes": { "Argentina": "departamento", "Colombia": "apartamento" },
+      "curiosidad": "En América, «piso» es sobre todo el suelo o la planta de un edificio."
+    },
+    {
+      "palabra": "chele",
+      "significado": "rubio, de piel clara",
+      "lugares": ["SV", "HN", "NI"],
+      "region": "Centroamérica",
+      "equivalentes": { "España": "rubio", "México": "güero", "Venezuela": "catire" },
+      "curiosidad": "Se dice de quien tiene la piel o el pelo claros, y se usa mucho como apodo cariñoso."
+    },
+    {
+      "palabra": "jote",
+      "significado": "buitre negro americano",
+      "lugares": ["CL", "AR"],
+      "region": "Cono Sur",
+      "equivalentes": { "México": "zopilote", "Venezuela": "zamuro", "Colombia": "gallinazo" },
+      "curiosidad": "En Chile también se llama jote, en broma, al que corteja con insistencia."
+    }
   ]
 ]

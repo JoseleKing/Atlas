@@ -5,7 +5,7 @@
    - Fuentes de Google: primero la caché, porque no cambian.
    Si cambias la lista de archivos, sube el número de VERSION. */
 
-const VERSION = 'atlas-v7';
+const VERSION = 'atlas-v8';
 const FUENTES = 'atlas-fuentes';
 
 const ARCHIVOS = [
