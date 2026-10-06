@@ -111,7 +111,7 @@ let intentos = [];       // rondas[ronda]
 let palabraTerminada = false;
 let terminada = false;   // todas las palabras del día jugadas
 let seleccion = null;    // código del lugar elegido y aún no confirmado
-let opciones = null;     // { lugares, x, y } si un toque cae entre varios lugares (x, y: fracción del mapa)
+let opciones = null;     // { lugares, x, y } si un toque cae entre varios lugares (x, y: fracción del mapa entero)
 let temporizador = null;
 
 const $ = (id) => document.getElementById(id);
@@ -180,6 +180,7 @@ function crearRosa(x, y) {
 
 function dibujarMapa() {
   const mapa = $('mapa');
+  const capa = $('camara'); // lo que se amplía y se mueve
   const { ANCHO, ALTO, RECUADRO: R, CAJA_CANARIAS: C, RECUADRO_CA: CA } = TRAZADOS;
   mapa.style.aspectRatio = `${ANCHO} / ${ALTO}`;
 
@@ -246,15 +247,24 @@ function dibujarMapa() {
   ampliada.appendChild(titulo);
   svg.appendChild(ampliada);
 
-  // Líneas guía de los países pequeños
+  // Líneas guía de los países pequeños (el punto del final va encima, en HTML,
+  // para que no crezca al ampliar el mapa)
   for (const lugar of Object.values(LUGARES)) {
     if (!lugar.ancla) continue;
     const { etiqueta: e, ancla: a } = lugar;
     svg.appendChild(elementoSvg('line', { class: 'mapa__guia', x1: e.x, y1: e.y, x2: a.x, y2: a.y }));
-    svg.appendChild(elementoSvg('circle', { class: 'mapa__ancla', cx: a.x, cy: a.y, r: 1.6 }));
   }
 
-  mapa.appendChild(svg);
+  capa.appendChild(svg);
+
+  for (const lugar of Object.values(LUGARES)) {
+    if (!lugar.ancla) continue;
+    const punto = document.createElement('span');
+    punto.className = 'mapa__ancla';
+    punto.style.left = `${(lugar.ancla.x / ANCHO) * 100}%`;
+    punto.style.top = `${(lugar.ancla.y / ALTO) * 100}%`;
+    capa.appendChild(punto);
+  }
 
   // Nombres (botones encima del dibujo)
   for (const [codigo, lugar] of Object.entries(LUGARES)) {
@@ -275,12 +285,12 @@ function dibujarMapa() {
     boton.addEventListener('mouseenter', () => (siluetas[codigo] || []).forEach((p) => p.classList.add('pais--encima')));
     boton.addEventListener('mouseleave', () => (siluetas[codigo] || []).forEach((p) => p.classList.remove('pais--encima')));
     etiquetas[codigo] = boton;
-    mapa.appendChild(boton);
+    capa.appendChild(boton);
   }
 
   // Bocadillo junto al lugar elegido, para confirmarlo (o para escoger entre
-  // varios lugares si el toque cae entre ellos): así se ve aunque se haya
-  // ampliado la pantalla con los dedos y la barra de abajo quede fuera de la vista.
+  // varios lugares si el toque cae entre ellos). Va fuera de la cámara, así que
+  // no crece al ampliar el mapa.
   const bocadillo = document.createElement('div');
   bocadillo.id = 'bocadillo';
   bocadillo.className = 'bocadillo';
@@ -288,12 +298,352 @@ function dibujarMapa() {
   // Sus botones se rehacen al tocarlos: que ese toque no llegue al mapa.
   bocadillo.addEventListener('click', (e) => e.stopPropagation());
   mapa.appendChild(bocadillo);
-  new ResizeObserver(() => { if (!bocadillo.hidden) colocarBocadillo(); }).observe(mapa);
 
-  // El navegador puede mover el clic de un toque hacia el botón más cercano;
-  // se guarda dónde cayó de verdad el dedo.
-  mapa.addEventListener('pointerdown', (e) => { puntoToque = { x: e.clientX, y: e.clientY }; });
-  mapa.addEventListener('click', tocarMapa);
+  prepararCamara();
+  // Con el teclado (Intro o espacio sobre un nombre) se elige ese lugar. Los
+  // toques y los clics del ratón se atienden en prepararCamara().
+  mapa.addEventListener('click', (e) => {
+    const boton = e.target.closest('.etiqueta');
+    if (e.detail === 0 && boton) elegir(boton.dataset.codigo);
+  });
+}
+
+/* ---------- Cámara del mapa ---------- */
+
+// El dibujo y los nombres van en #camara, que se amplía y se mueve con
+// translate y scale: z es el aumento (1 = mapa entero) y x, y el desplazamiento.
+// x, y se guardan en fracciones del ancho de la ventana, para que la vista no
+// cambie aunque cambie el tamaño del mapa; camaraPx() los da en px. Las medidas
+// «del mapa» son px de la ventana del mapa con aumento 1.
+const ZOOM_MAX = 7;
+const TOQUE_PX = 8;          // si el dedo se mueve más, es un arrastre y no elige lugar
+const TOQUE_MS = 350;        // si el dedo tarda más en levantarse, tampoco
+const DOBLE_TOQUE_MS = 300;  // dos toques seguidos en este tiempo acercan el mapa
+const CAMARA_ENTERA = { x: 0, y: 0, z: 1 };
+
+const camara = { ...CAMARA_ENTERA };
+let camaraPendiente = false;
+let animacionCamara = null;
+let finRueda = null;
+const sinMovimiento = matchMedia('(prefers-reduced-motion: reduce)');
+
+function ventanaMapa() {
+  const mapa = $('mapa');
+  return { ancho: mapa.clientWidth, alto: mapa.clientHeight };
+}
+
+// Punto de la pantalla → punto de la ventana del mapa (dentro de su borde).
+function enVentana(x, y) {
+  const mapa = $('mapa');
+  const caja = mapa.getBoundingClientRect();
+  return { x: x - caja.left - mapa.clientLeft, y: y - caja.top - mapa.clientTop };
+}
+
+// Cámara con el desplazamiento en px de la ventana.
+function camaraPx() {
+  const { ancho } = ventanaMapa();
+  return { x: camara.x * ancho, y: camara.y * ancho, z: camara.z };
+}
+
+// Punto de la pantalla → punto del mapa.
+function aMapa(x, y) {
+  const p = enVentana(x, y);
+  const c = camaraPx();
+  return { x: (p.x - c.x) / c.z, y: (p.y - c.y) / c.z };
+}
+
+const limitarZoom = (z) => Math.min(Math.max(z, 1), ZOOM_MAX);
+
+// El mapa siempre cubre la ventana: ni se aleja más que entero ni se sale al arrastrarlo.
+function limitar({ x, y, z }) {
+  const { ancho, alto } = ventanaMapa();
+  z = limitarZoom(z);
+  return {
+    z,
+    x: Math.min(0, Math.max(ancho * (1 - z), x)),
+    y: Math.min(0, Math.max(alto * (1 - z), y)),
+  };
+}
+
+// Cambia la cámara (destino en px); se pinta en el siguiente fotograma.
+function moverCamara(destino) {
+  const { ancho } = ventanaMapa();
+  const c = limitar(destino);
+  camara.z = c.z;
+  camara.x = ancho ? c.x / ancho : 0;
+  camara.y = ancho ? c.y / ancho : 0;
+  if (camaraPendiente) return;
+  camaraPendiente = true;
+  requestAnimationFrame(pintarCamara);
+}
+
+function pintarCamara() {
+  camaraPendiente = false;
+  const el = $('camara');
+  const c = camaraPx();
+  el.style.transform = `translate(${c.x}px, ${c.y}px) scale(${c.z})`;
+  // Los nombres, las flechas y las marcas se encogen lo mismo para no crecer en pantalla.
+  el.style.setProperty('--inverso', 1 / camara.z);
+  $('boton-encuadrar').hidden = camara.z < 1.01;
+  if (!el.classList.contains('mapa__camara--moviendo')) ajustarTrazo();
+  if (!$('bocadillo').hidden) colocarBocadillo();
+}
+
+// Mientras se mueve, la cámara va en su propia capa (fluido); al pararse se
+// quita para que el navegador vuelva a dibujar el mapa nítido con el aumento nuevo.
+function enMovimiento(si) {
+  $('camara').classList.toggle('mapa__camara--moviendo', si);
+  if (!si) ajustarTrazo();
+}
+
+// Grosor de las líneas del dibujo para el aumento actual (ver --trazo en estilos.css).
+function ajustarTrazo() {
+  $('camara').style.setProperty('--trazo', 1 / camara.z);
+}
+
+// Acerca o aleja manteniendo quieto el punto (px, py) de la ventana.
+function ampliarEn(px, py, z, base = camaraPx()) {
+  z = limitarZoom(z);
+  const k = z / base.z;
+  return { z, x: px - (px - base.x) * k, y: py - (py - base.y) * k };
+}
+
+function cancelarAnimacion() {
+  if (animacionCamara) cancelAnimationFrame(animacionCamara);
+  animacionCamara = null;
+}
+
+// Lleva la cámara a destino (en px) con una animación corta. Se anima en
+// fracciones del ancho, así que aguanta que el mapa cambie de tamaño a la vez.
+function animarCamara(destino, ms = 420) {
+  cancelarAnimacion();
+  const { ancho } = ventanaMapa();
+  const desde = { ...camara };
+  const fin = limitar(destino);
+  const hasta = { z: fin.z, x: fin.x / ancho, y: fin.y / ancho };
+  if (sinMovimiento.matches || Math.abs(hasta.z - desde.z) + (Math.abs(hasta.x - desde.x) + Math.abs(hasta.y - desde.y)) * ancho < 0.5) {
+    moverCamara(fin);
+    return;
+  }
+  enMovimiento(true);
+  const inicio = performance.now();
+  const paso = (ahora) => {
+    const t = Math.min(1, (ahora - inicio) / ms);
+    const e = t < 0.5 ? 2 * t * t : 1 - ((-2 * t + 2) ** 2) / 2;
+    const w = ventanaMapa().ancho;
+    moverCamara({
+      z: desde.z + (hasta.z - desde.z) * e,
+      x: (desde.x + (hasta.x - desde.x) * e) * w,
+      y: (desde.y + (hasta.y - desde.y) * e) * w,
+    });
+    if (t < 1) animacionCamara = requestAnimationFrame(paso);
+    else { animacionCamara = null; enMovimiento(false); }
+  };
+  animacionCamara = requestAnimationFrame(paso);
+}
+
+// Cámara que deja la caja del mapa { izquierda, arriba, derecha, abajo } en el
+// centro de la ventana, con márgenes en px de pantalla y sin pasar de zMax.
+function encuadre(caja, zMax, margen) {
+  const { ancho, alto } = ventanaMapa();
+  const w = Math.max(caja.derecha - caja.izquierda, 1);
+  const h = Math.max(caja.abajo - caja.arriba, 1);
+  const z = limitarZoom(Math.min(
+    (ancho - margen.izquierda - margen.derecha) / w,
+    (alto - margen.arriba - margen.abajo) / h,
+    zMax,
+  ));
+  const cx = (caja.izquierda + caja.derecha) / 2;
+  const cy = (caja.arriba + caja.abajo) / 2;
+  return {
+    z,
+    x: (margen.izquierda + ancho - margen.derecha) / 2 - cx * z,
+    y: (margen.arriba + alto - margen.abajo) / 2 - cy * z,
+  };
+}
+
+const unirCajas = (a, b) => (a ? {
+  izquierda: Math.min(a.izquierda, b.izquierda), arriba: Math.min(a.arriba, b.arriba),
+  derecha: Math.max(a.derecha, b.derecha), abajo: Math.max(a.abajo, b.abajo),
+} : b);
+
+// Caja del mapa de un rectángulo de la pantalla.
+function cajaDePantalla(r) {
+  const a = aMapa(r.left, r.top);
+  const b = aMapa(r.right, r.bottom);
+  return { izquierda: a.x, arriba: a.y, derecha: b.x, abajo: b.y };
+}
+
+// Caja del mapa de un lugar: su contorno (el del recuadro ampliado, si lo tiene),
+// el punto de su nombre y el de su línea guía.
+function cajaDeLugar(codigo) {
+  const { ancho } = ventanaMapa();
+  const k = ancho / TRAZADOS.ANCHO;
+  const lugar = LUGARES[codigo];
+  const punto = (p) => ({ izquierda: p.x * k, arriba: p.y * k, derecha: p.x * k, abajo: p.y * k });
+  let caja = punto(lugar.etiqueta);
+  if (lugar.ancla) caja = unirCajas(caja, punto(lugar.ancla));
+  const contornos = siluetas[codigo] || [];
+  const contorno = contornos[contornos.length - 1];
+  if (contorno) {
+    const b = contorno.getBBox();
+    caja = unirCajas(caja, { izquierda: b.x * k, arriba: b.y * k, derecha: (b.x + b.width) * k, abajo: (b.y + b.height) * k });
+  }
+  return caja;
+}
+
+// Tras un fallo: si el nombre fallado (con su flecha) no se ve entero, la cámara
+// se aleja lo justo para que quepan lo que se veía y ese nombre.
+function mostrarLugar(codigo) {
+  if (camara.z === 1) return;
+  const mapa = $('mapa').getBoundingClientRect();
+  const r = etiquetas[codigo].getBoundingClientRect();
+  const m = 8;
+  if (r.left >= mapa.left + m && r.right <= mapa.right - m && r.top >= mapa.top + m && r.bottom <= mapa.bottom - m) return;
+  const vista = cajaDePantalla(mapa);
+  const nombre = cajaDePantalla({ left: r.left - m, top: r.top - m, right: r.right + m, bottom: r.bottom + m });
+  animarCamara(encuadre(unirCajas(vista, nombre), camara.z, { izquierda: 0, arriba: 0, derecha: 0, abajo: 0 }));
+}
+
+// Al acabar la palabra, si el mapa está ampliado, la cámara centra los lugares
+// correctos (alejándose si hace falta para que quepan todos) sin acercarse más.
+function centrarSolucion() {
+  if (camara.z === 1) return;
+  const caja = palabra.lugares.filter((c) => LUGARES[c]).map(cajaDeLugar).reduce(unirCajas, null);
+  if (!caja) return;
+  // Margen para que quepan los nombres.
+  animarCamara(encuadre(caja, camara.z, { izquierda: 56, arriba: 36, derecha: 56, abajo: 36 }));
+}
+
+// Gestos dentro del mapa: un dedo arrastra, dos dedos acercan y alejan, y un
+// toque corto y quieto elige lugar. Dos toques seguidos acercan.
+function prepararCamara() {
+  const mapa = $('mapa');
+  const punteros = new Map();   // pointerId → punto de la ventana
+  let gesto = null;             // { tipo: 'toque' | 'arrastre' | 'pellizco', … }
+  let ultimoToque = null;       // { t, x, y } para reconocer el doble toque
+
+  const dosPrimeros = () => [...punteros.values()].slice(0, 2);
+
+  const empezarPellizco = () => {
+    const [a, b] = dosPrimeros();
+    gesto = {
+      tipo: 'pellizco',
+      distancia: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+      centro: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 },
+      base: camaraPx(),
+    };
+    enMovimiento(true);
+  };
+
+  mapa.addEventListener('pointerdown', (e) => {
+    if (e.target.closest('.bocadillo, .mapa__encuadrar')) return;
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    cancelarAnimacion();
+    try { mapa.setPointerCapture(e.pointerId); } catch (error) { /* sin captura, se sigue igual */ }
+    const p = enVentana(e.clientX, e.clientY);
+    punteros.set(e.pointerId, p);
+    if (punteros.size === 1) {
+      // El navegador puede mover el clic de un toque hacia el botón más cercano;
+      // se guarda dónde cayó de verdad el dedo.
+      gesto = { tipo: 'toque', inicio: e.timeStamp, origen: p, ultimo: p, pantalla: { x: e.clientX, y: e.clientY } };
+    } else if (punteros.size === 2) {
+      empezarPellizco();
+    }
+  });
+
+  mapa.addEventListener('pointermove', (e) => {
+    if (!punteros.has(e.pointerId)) return;
+    const p = enVentana(e.clientX, e.clientY);
+    punteros.set(e.pointerId, p);
+
+    if (gesto.tipo === 'pellizco') {
+      const [a, b] = dosPrimeros();
+      const distancia = Math.hypot(a.x - b.x, a.y - b.y);
+      const centro = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      // El punto del mapa que estaba bajo los dedos sigue bajo los dedos.
+      const z = limitarZoom(gesto.base.z * (distancia / gesto.distancia));
+      const mx = (gesto.centro.x - gesto.base.x) / gesto.base.z;
+      const my = (gesto.centro.y - gesto.base.y) / gesto.base.z;
+      moverCamara({ z, x: centro.x - mx * z, y: centro.y - my * z });
+      return;
+    }
+
+    if (gesto.tipo === 'toque') {
+      if (Math.hypot(p.x - gesto.origen.x, p.y - gesto.origen.y) < TOQUE_PX) return;
+      gesto.tipo = 'arrastre';
+      enMovimiento(true);
+    }
+    const c = camaraPx();
+    moverCamara({ z: c.z, x: c.x + p.x - gesto.ultimo.x, y: c.y + p.y - gesto.ultimo.y });
+    gesto.ultimo = p;
+  });
+
+  const soltar = (e) => {
+    if (!punteros.has(e.pointerId)) return;
+    punteros.delete(e.pointerId);
+
+    if (gesto.tipo === 'pellizco') {
+      if (punteros.size >= 2) empezarPellizco();
+      // Con un dedo aún puesto, se sigue arrastrando desde donde está.
+      else if (punteros.size === 1) gesto = { tipo: 'arrastre', ultimo: [...punteros.values()][0] };
+      else enMovimiento(false);
+      return;
+    }
+    if (punteros.size) return;
+    enMovimiento(false);
+
+    const esToque = gesto.tipo === 'toque' && e.type === 'pointerup' && e.timeStamp - gesto.inicio < TOQUE_MS;
+    if (!esToque) return;
+    const p = gesto.origen;
+    if (ultimoToque && e.timeStamp - ultimoToque.t < DOBLE_TOQUE_MS && Math.hypot(p.x - ultimoToque.x, p.y - ultimoToque.y) < 30) {
+      // Doble toque: acerca ahí (o, si ya está al máximo, vuelve al mapa entero).
+      // El primer toque ya eligió lugar; este no elige nada.
+      ultimoToque = null;
+      animarCamara(camara.z >= ZOOM_MAX - 0.01 ? CAMARA_ENTERA : ampliarEn(p.x, p.y, camara.z * 2.5), 300);
+      return;
+    }
+    ultimoToque = { t: e.timeStamp, x: p.x, y: p.y };
+    tocarMapa(gesto.pantalla.x, gesto.pantalla.y);
+  };
+  mapa.addEventListener('pointerup', soltar);
+  mapa.addEventListener('pointercancel', soltar);
+
+  // Ratón y panel táctil del ordenador: la rueda (o pellizcar en el panel) acerca y aleja.
+  mapa.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    cancelarAnimacion();
+    const delta = e.deltaY * (e.deltaMode === 1 ? 16 : 1);
+    const p = enVentana(e.clientX, e.clientY);
+    enMovimiento(true);
+    moverCamara(ampliarEn(p.x, p.y, camara.z * Math.exp(-delta * (e.ctrlKey ? 0.01 : 0.002))));
+    clearTimeout(finRueda);
+    finRueda = setTimeout(() => enMovimiento(false), 200);
+  }, { passive: false });
+
+  $('boton-encuadrar').addEventListener('click', () => animarCamara(CAMARA_ENTERA));
+
+  // Si cambia el tamaño de la ventana del mapa, se repinta: como la cámara va en
+  // fracciones del ancho, se sigue viendo lo mismo.
+  new ResizeObserver(() => { if (mapa.clientWidth) moverCamara(camaraPx()); }).observe(mapa);
+}
+
+// La página no se amplía: solo el mapa. Además del meta viewport y de touch-action
+// (estilos.css), se frenan los gestos de Safari en iOS (que puede no hacer caso de
+// user-scalable=no), los pellizcos y el doble toque para ampliar fuera del mapa.
+function bloquearZoomPagina() {
+  const frenar = (e) => e.preventDefault();
+  for (const tipo of ['gesturestart', 'gesturechange', 'gestureend']) {
+    document.addEventListener(tipo, frenar, { passive: false });
+  }
+  document.addEventListener('touchmove', (e) => {
+    if (e.touches.length > 1 && !e.target.closest('#mapa')) e.preventDefault();
+  }, { passive: false });
+  let ultimoFin = 0;
+  document.addEventListener('touchend', (e) => {
+    if (e.timeStamp - ultimoFin < DOBLE_TOQUE_MS && !e.target.closest('#mapa')) e.preventDefault();
+    ultimoFin = e.timeStamp;
+  }, { passive: false });
 }
 
 /* ---------- Interacción ---------- */
@@ -314,25 +664,15 @@ function destello(codigo) {
   nombre.classList.add('destello');
 }
 
-// Radio (px) alrededor del dedo en el que se buscan lugares, para que no haga
-// falta ampliar la pantalla para acertar con los países pequeños.
+// Radio (px de pantalla) alrededor del dedo en el que se buscan lugares, para que
+// no haga falta ampliar el mapa para acertar con los países pequeños.
 const RADIO_TOQUE = 14;
-let puntoToque = null;
 
-// Toque en el mapa: si cae sobre un nombre o no hay dudas, se elige ese lugar;
-// si cae entre varios, el bocadillo pregunta cuál.
-function tocarMapa(evento) {
-  if (palabraTerminada || evento.target.closest('.mapa__siguiente')) return;
-
-  // Con el teclado (Intro o espacio sobre un nombre) no hay punto que mirar.
-  if (evento.detail === 0) {
-    const boton = evento.target.closest('.etiqueta');
-    if (boton) elegir(boton.dataset.codigo);
-    return;
-  }
-
-  const { x, y } = puntoToque || { x: evento.clientX, y: evento.clientY };
-  puntoToque = null;
+// Toque en el mapa (x, y: punto de la pantalla): si cae sobre un nombre o no hay
+// dudas, se elige ese lugar; si cae entre varios, el bocadillo pregunta cuál.
+// elementsFromPoint ya tiene en cuenta el aumento de la cámara.
+function tocarMapa(x, y) {
+  if (palabraTerminada) return;
   const candidatos = lugaresCerca(x, y);
   if (candidatos.length === 1) elegir(candidatos[0]);
   else if (candidatos.length > 1) preguntar(candidatos, x, y);
@@ -398,8 +738,9 @@ function preguntar(candidatos, x, y) {
   if (seleccion) marcar(seleccion, '');
   seleccion = null;
   quitarCandidatos();
-  const caja = $('mapa').getBoundingClientRect();
-  opciones = { lugares: candidatos, x: (x - caja.left) / caja.width, y: (y - caja.top) / caja.height };
+  const punto = aMapa(x, y);
+  const { ancho, alto } = ventanaMapa();
+  opciones = { lugares: candidatos, x: punto.x / ancho, y: punto.y / alto };
   for (const c of candidatos) etiquetas[c].classList.add('etiqueta--candidata');
   mostrarBocadillo();
 }
@@ -441,7 +782,7 @@ function mostrarBocadillo() {
 }
 
 // Encima del nombre elegido o del punto tocado (o debajo, si arriba no cabe),
-// sin salirse del mapa.
+// sin salirse de la ventana del mapa aunque el nombre haya quedado fuera al moverlo.
 function colocarBocadillo() {
   const mapa = $('mapa');
   const bocadillo = $('bocadillo');
@@ -449,8 +790,10 @@ function colocarBocadillo() {
   let nombre;
   if (opciones) {
     // Un poco por encima y por debajo del dedo, para no taparlo.
-    const x = caja.left + opciones.x * caja.width;
-    const y = caja.top + opciones.y * caja.height;
+    const ventana = ventanaMapa();
+    const c = camaraPx();
+    const x = caja.left + mapa.clientLeft + c.x + opciones.x * ventana.ancho * c.z;
+    const y = caja.top + mapa.clientTop + c.y + opciones.y * ventana.alto * c.z;
     nombre = { left: x, width: 0, top: y - 16, bottom: y + 16 };
   } else {
     nombre = etiquetas[seleccion].querySelector('.etiqueta__nombre').getBoundingClientRect();
@@ -461,7 +804,8 @@ function colocarBocadillo() {
   const centro = nombre.left + nombre.width / 2 - caja.left;
   const x = Math.min(Math.max(centro - ancho / 2, margen), mapa.clientWidth - ancho - margen);
   const arriba = nombre.top - caja.top - alto - 10 >= margen;
-  const y = arriba ? nombre.top - caja.top - alto - 10 : nombre.bottom - caja.top + 10;
+  const y = Math.min(Math.max(arriba ? nombre.top - caja.top - alto - 10 : nombre.bottom - caja.top + 10, margen),
+    mapa.clientHeight - alto - margen);
   bocadillo.style.left = `${x}px`;
   bocadillo.style.top = `${y}px`;
   bocadillo.style.setProperty('--pico', `${Math.min(Math.max(centro - x, 14), ancho - 14)}px`);
@@ -482,6 +826,9 @@ function confirmar() {
   guardarPartida();
 
   pintar(true);
+  // La cámara enseña la solución o, tras un fallo, el lugar fallado con su flecha.
+  if (palabraTerminada) centrarSolucion();
+  else mostrarLugar(codigo);
   if (terminada) {
     avisarAlmanaque();
     setTimeout(() => $('resultado').scrollIntoView({ behavior: 'smooth', block: 'start' }), 350);
@@ -502,6 +849,7 @@ function siguiente() {
   guardarPartida();
   pintarPalabra();
   pintar(false);
+  animarCamara(CAMARA_ENTERA);
   $('palabra-bloque').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
@@ -573,12 +921,14 @@ function pintarIntentos() {
   const quedan = CONFIG.INTENTOS - intentos.length;
   caja.setAttribute('aria-label', palabraTerminada ? 'Palabra terminada' : `Quedan ${quedan} intentos`);
 
-  // Al acabar cada palabra se desvela su significado (o sus significados).
+  // Al acabar cada palabra se desvela su significado (o sus significados): durante
+  // la partida en la barra de abajo (pintarPista) y, al terminar el día, aquí.
   const significado = $('palabra-significado');
-  const textos = significados(palabra).map((s) => `«${s.significado}»`);
-  significado.textContent = textos.join(' o ');
-  significado.hidden = !palabraTerminada || !textos.length;
+  significado.textContent = textosSignificado().join(' o ');
+  significado.hidden = !terminada || !significado.textContent;
 }
+
+const textosSignificado = () => significados(palabra).map((s) => `«${s.significado}»`);
 
 function pintarMapa(animar) {
   for (const [codigo, etiqueta] of Object.entries(etiquetas)) {
@@ -622,6 +972,8 @@ function pintarPista(animar) {
   }
 
   $('barra').hidden = terminada;
+  // Durante la partida, la página entera cabe en la pantalla (ver .en-juego en estilos.css).
+  document.body.classList.toggle('en-juego', !terminada);
   $('boton-siguiente').hidden = !palabraTerminada || terminada;
   if (terminada) return;
 
@@ -636,11 +988,15 @@ function pintarPista(animar) {
     $('pista-flecha').style.transform = 'rotate(0deg)';
   }
 
-  // Palabra acabada (y quedan más): solución (el botón para seguir sale en el mapa).
+  // Palabra acabada (y quedan más): solución, con el botón para seguir encima.
   if (palabraTerminada) {
     const veredicto = document.createElement('strong');
     veredicto.textContent = ultimo.acierto ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'No ha podido ser.';
-    pista.append(veredicto, ` Se dice en ${listaConY(nombresLugares(palabra.lugares))}.`);
+    const textos = textosSignificado();
+    const lugares = listaConY(nombresLugares(palabra.lugares));
+    pista.append(veredicto, textos.length
+      ? ` «${palabra.palabra}» significa ${textos.join(' o ')} y se dice en ${lugares}.`
+      : ` Se dice en ${lugares}.`);
     return;
   }
 
@@ -917,6 +1273,7 @@ function avisarAlmanaque() {
 /* ---------- Arranque ---------- */
 
 async function iniciar() {
+  bloquearZoomPagina();
   $('boton-siguiente').addEventListener('click', siguiente);
   $('boton-compartir').addEventListener('click', compartir);
   prepararAyuda();

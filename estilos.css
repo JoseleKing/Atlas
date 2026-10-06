@@ -22,7 +22,9 @@
 
 *, *::before, *::after { box-sizing: border-box; }
 
-html { -webkit-text-size-adjust: 100%; }
+/* La página no se amplía con los dedos (solo el mapa, ver .mapa): se puede
+   desplazar, pero no pellizcar ni ampliar con doble toque. */
+html { -webkit-text-size-adjust: 100%; touch-action: pan-x pan-y; }
 
 body {
   margin: 0;
@@ -217,8 +219,18 @@ button { font: inherit; color: inherit; }
   font-size: 1.15rem;
 }
 
+.palabra__estado {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  min-height: 30px;
+  margin-top: 6px;
+}
+
 .palabra__region {
-  margin: 8px auto 0;
+  margin: 0;
   display: inline-block;
   padding: 2px 12px;
   border: 1px solid var(--acento);
@@ -232,7 +244,6 @@ button { font: inherit; color: inherit; }
   display: flex;
   justify-content: center;
   gap: 8px;
-  margin-top: 10px;
 }
 
 .intento {
@@ -251,11 +262,18 @@ button { font: inherit; color: inherit; }
 
 /* ---------- Mapa ---------- */
 
+.mapa-hueco { margin-top: 14px; }
+
+/* La ventana del mapa: quieta. Dentro, la cámara se amplía y se mueve con los
+   dedos (juego.js); los gestos los atiende el juego, no el navegador. */
 .mapa {
   position: relative;
   container-type: inline-size;
   aspect-ratio: 360 / 472;
-  margin-top: 14px;
+  touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   background: var(--fondo);
   border: 1px solid var(--tinta);
   border-radius: var(--radio);
@@ -263,6 +281,21 @@ button { font: inherit; color: inherit; }
   /* doble filete interior, como el marco de un grabado */
   box-shadow: inset 0 0 0 3px var(--papel), inset 0 0 0 4px var(--linea);
 }
+
+.mapa__camara {
+  position: absolute;
+  inset: 0;
+  transform-origin: 0 0;
+}
+
+/* Mientras se mueve, la cámara y los nombres van en capas propias: el dibujo no
+   se repinta en cada fotograma */
+.mapa__camara--moviendo,
+.mapa__camara--moviendo :is(.etiqueta, .mapa__ancla) { will-change: transform; }
+
+/* Las líneas del dibujo no engordan al ampliar: --trazo (juego.js) es el inverso
+   del aumento y se pone al soltar los dedos, para no repintar el dibujo en cada
+   fotograma del gesto */
 
 .mapa__lienzo {
   position: absolute;
@@ -277,15 +310,15 @@ button { font: inherit; color: inherit; }
 .mapa__reticula {
   fill: none;
   stroke: var(--linea);
-  stroke-width: .4;
+  stroke-width: calc(.4px * var(--trazo, 1));
   opacity: .55;
 }
 
 .mapa__ecuador {
   fill: none;
   stroke: var(--acento);
-  stroke-width: .8;
-  stroke-dasharray: 5 3;
+  stroke-width: calc(.8px * var(--trazo, 1));
+  stroke-dasharray: calc(5px * var(--trazo, 1)) calc(3px * var(--trazo, 1));
   opacity: .6;
 }
 
@@ -293,7 +326,7 @@ button { font: inherit; color: inherit; }
 .mapa__costa {
   fill: none;
   stroke: var(--linea);
-  stroke-width: 4;
+  stroke-width: calc(4px * var(--trazo, 1));
   stroke-linejoin: round;
   opacity: .35;
 }
@@ -301,7 +334,7 @@ button { font: inherit; color: inherit; }
 .mapa__otros {
   fill: var(--relleno);
   stroke: var(--linea);
-  stroke-width: .5;
+  stroke-width: calc(.5px * var(--trazo, 1));
   stroke-linejoin: round;
 }
 
@@ -325,24 +358,37 @@ button { font: inherit; color: inherit; }
 .mapa__marco {
   fill: none;
   stroke: var(--tinta);
-  stroke-width: .8;
+  stroke-width: calc(.8px * var(--trazo, 1));
 }
 .mapa__mar.mapa__marco { fill: var(--fondo); }
-.mapa__marco--canarias { stroke-width: .6; stroke-dasharray: 2 1.5; }
+.mapa__marco--canarias {
+  stroke-width: calc(.6px * var(--trazo, 1));
+  stroke-dasharray: calc(2px * var(--trazo, 1)) calc(1.5px * var(--trazo, 1));
+}
 
 .mapa__guia {
   stroke: var(--tinta);
-  stroke-width: .5;
+  stroke-width: calc(.5px * var(--trazo, 1));
   opacity: .7;
 }
 
-.mapa__ancla { fill: var(--tinta); }
+/* Punto al final de la línea guía (no crece al ampliar, como los nombres) */
+.mapa__ancla {
+  position: absolute;
+  width: 3.2px;
+  height: 3.2px;
+  margin: -1.6px 0 0 -1.6px;
+  border-radius: 50%;
+  background: var(--tinta);
+  pointer-events: none;
+  transform: scale(var(--inverso, 1));
+}
 
 /* Países del juego */
 .pais {
   fill: var(--papel);
   stroke: var(--tinta);
-  stroke-width: .6;
+  stroke-width: calc(.6px * var(--trazo, 1));
   stroke-linejoin: round;
   cursor: pointer;
   transition: fill .2s;
@@ -361,7 +407,9 @@ button { font: inherit; color: inherit; }
 /* Nombres de los países: botones de al menos 44 × 44 px */
 .etiqueta {
   position: absolute;
-  transform: translate(-50%, -50%);
+  /* --inverso (juego.js) deshace el aumento de la cámara: el nombre, su zona de
+     toque y su flecha miden lo mismo en pantalla con cualquier aumento */
+  transform: translate(-50%, -50%) scale(var(--inverso, 1));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,7 +421,9 @@ button { font: inherit; color: inherit; }
   background: none;
   color: var(--tinta);
   font-family: var(--texto);
-  font-size: clamp(11px, 3.3cqi, 13px);
+  /* proporcional al mapa, para que los nombres quepan igual aunque el mapa salga
+     más pequeño en pantallas bajas (con el zoom se leen de cerca) */
+  font-size: clamp(9px, 3.3cqi, 13px);
   font-weight: 500;
   font-variant: small-caps;
   letter-spacing: .05em;
@@ -393,7 +443,11 @@ button { font: inherit; color: inherit; }
 }
 
 /* Nombre a la izquierda del punto (su final queda junto a la línea guía) */
-.etiqueta--izquierda { transform: translate(-100%, -50%); justify-content: flex-end; }
+.etiqueta--izquierda {
+  transform: translate(-100%, -50%) scale(var(--inverso, 1));
+  transform-origin: 100% 50%;
+  justify-content: flex-end;
+}
 
 /* Los nombres escritos en el mar tapan la línea guía */
 .etiqueta--mar .etiqueta__nombre {
@@ -540,29 +594,37 @@ button { font: inherit; color: inherit; }
   to { opacity: 1; }
 }
 
-/* Botón «Siguiente palabra», en el centro del mapa al acabar cada palabra */
-.mapa__siguiente {
+/* Botón para volver al mapa entero (solo con el mapa ampliado) */
+.mapa__encuadrar {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  z-index: 3;
-  transform: translate(-50%, -50%);
-  min-height: 54px;
-  padding: 12px 28px;
-  border-radius: 999px;
-  font-size: 1.2rem;
-  white-space: nowrap;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--tinta);
+  border-radius: 50%;
+  background: var(--papel);
+  box-shadow: 0 1px 4px rgba(43, 36, 32, .2);
+  cursor: pointer;
   touch-action: manipulation;
-  box-shadow: 0 0 0 4px var(--papel), 0 6px 18px rgba(43, 36, 32, .35);
-  animation: aparecer-siguiente .35s ease-out;
+  animation: fundido .2s ease both;
 }
 
-.mapa__siguiente[hidden] { display: none; }
-
-@keyframes aparecer-siguiente {
-  from { opacity: 0; transform: translate(-50%, -50%) scale(.85); }
-  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.mapa__encuadrar svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
+
+.mapa__encuadrar:focus-visible { outline: 2px solid var(--acento); outline-offset: 2px; }
 
 /* ---------- Barra de elección ---------- */
 
@@ -577,6 +639,12 @@ button { font: inherit; color: inherit; }
   display: grid;
   gap: 8px;
 }
+
+.barra__pistas { display: grid; }
+
+/* Resultado de la palabra, con el botón «Siguiente palabra» encima */
+.barra__final { display: grid; gap: 8px; }
+#boton-siguiente { animation: fundido .3s ease both; }
 
 .barra__pista {
   margin: 0;
@@ -834,6 +902,92 @@ details[open] .resultado__mas::after { transform: rotate(180deg); }
 .dialogo__lista li { margin-bottom: 6px; }
 
 .dialogo form { margin-top: 14px; }
+
+/* ---------- Pantalla de juego ---------- */
+
+/* Durante la partida, todo cabe en la pantalla y la página no se desplaza: la
+   palabra arriba, las pistas abajo y el mapa en el hueco que queda. Al terminar
+   el día, la página vuelve a desplazarse para ver el resultado. */
+body.en-juego {
+  height: 100vh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.en-juego .pagina {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+
+.en-juego #juego {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.en-juego .mapa-hueco {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.en-juego .mapa { width: min(100%, 100cqh * 360 / 472); }
+
+.en-juego .barra { position: static; }
+
+/* El texto de la barra (o el resultado con el botón) y la tarjeta de pista ocupan
+   la misma celda y la barra mide siempre al menos lo que la tarjeta: así no crece
+   al fallar ni encoge el mapa */
+.en-juego .barra__pistas > .barra__final,
+.en-juego .barra__pistas > #pista-tarjeta { grid-area: 1 / 1; align-self: center; }
+.en-juego .barra__final > #pista[hidden] { display: block !important; visibility: hidden; }
+.en-juego .barra__pistas > #pista-tarjeta[hidden] { display: flex !important; visibility: hidden; }
+.pista__temperatura { min-height: 1.1em; }
+.pista__rumbo, .pista__detalle { min-height: 1.4em; }
+
+/* En pantallas bajas, cabecera y palabra más compactas para dejar sitio al mapa */
+@media (max-height: 820px) {
+  .en-juego .cabecera { padding: 4px 0; }
+  .en-juego .marca { flex-direction: row; justify-content: center; gap: 8px; }
+  .en-juego .marca__logo { width: 34px; height: 34px; }
+  .en-juego .marca__nombre { margin-top: 0; font-size: 1.45rem; }
+  .en-juego .palabra { margin-top: 10px; padding: 8px 16px 10px; }
+  .en-juego .palabra__texto { font-size: 2.3rem; }
+  .en-juego .palabra__estado { margin-top: 4px; }
+  .en-juego .mapa-hueco { margin-top: 10px; }
+  .en-juego .barra { margin-top: 8px; padding-top: 8px; }
+}
+
+/* Pantallas muy bajas (un móvil pequeño con las barras del navegador) */
+@media (max-height: 640px) {
+  .en-juego .marca__logo { width: 30px; height: 30px; }
+  .en-juego .marca__nombre { font-size: 1.3rem; }
+  .en-juego .cabecera { padding: 2px 0; }
+  .en-juego .palabra { padding: 6px 14px 6px; }
+  .en-juego .palabra__numero { font-size: .78rem; }
+  .en-juego .palabra__texto { font-size: 1.9rem; }
+  .en-juego .palabra__estado { min-height: 26px; margin-top: 2px; }
+  .en-juego .palabra__region { padding: 1px 10px; font-size: .88rem; }
+  .en-juego .mapa-hueco { margin-top: 8px; }
+  .en-juego .barra { gap: 0; padding-top: 6px; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+  .en-juego .barra__pista { font-size: .92rem; line-height: 1.3; }
+  .en-juego .pista { gap: 10px; padding: 5px 10px; }
+  .en-juego .pista__brujula { width: 34px; height: 34px; }
+  .en-juego .pista__flecha { width: 20px; height: 20px; }
+  .en-juego .pista__temperatura { font-size: 1rem; }
+  .en-juego .pista__rumbo { font-size: .95rem; line-height: 1.25; min-height: 1.25em; }
+  .en-juego .pista__detalle { font-size: .82rem; line-height: 1.25; min-height: 1.25em; }
+}
 
 /* ---------- Escritorio ---------- */
 

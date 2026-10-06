@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <title>Atlas</title>
   <meta name="description" content="Atlas: cada día, tres palabras del español. ¿Sabes dónde se dicen?">
   <meta name="theme-color" content="#F3EBDD">
@@ -57,34 +57,52 @@
         <h2 class="palabra__texto" id="palabra-texto">…</h2>
         <p class="palabra__significado" id="palabra-significado" hidden></p>
         <p class="palabra__significado" id="palabra-error" hidden></p>
-        <p class="palabra__region" id="palabra-region" hidden></p>
-        <div class="intentos" id="intentos" aria-label="Intentos"></div>
+        <!-- Intentos y, tras el segundo fallo, la región (en la misma fila, para
+             que la tarjeta no crezca y el mapa no cambie de tamaño) -->
+        <div class="palabra__estado">
+          <div class="intentos" id="intentos" aria-label="Intentos"></div>
+          <p class="palabra__region" id="palabra-region" hidden></p>
+        </div>
       </section>
 
-      <!-- Mapa: se dibuja desde juego.js con los contornos de mapa-trazados.js y los nombres de mapa.js -->
-      <section class="mapa" id="mapa" aria-label="Mapa del mundo hispanohablante">
-        <!-- Al acabar una palabra, el botón para seguir aparece en el centro del mapa -->
-        <button class="boton boton--principal mapa__siguiente" id="boton-siguiente" type="button" hidden>Siguiente palabra →</button>
-      </section>
+      <!-- Mapa: se dibuja desde juego.js con los contornos de mapa-trazados.js y los nombres de mapa.js.
+           El dibujo y los nombres van en la cámara, que se amplía y se mueve con los dedos;
+           el bocadillo y los botones quedan fuera, quietos en la ventana del mapa. -->
+      <div class="mapa-hueco">
+        <section class="mapa" id="mapa" aria-label="Mapa del mundo hispanohablante">
+          <div class="mapa__camara" id="camara"></div>
+          <!-- Vuelve al mapa entero; solo se ve con el mapa ampliado -->
+          <button class="mapa__encuadrar" id="boton-encuadrar" type="button" aria-label="Ver el mapa entero" hidden>
+            <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M2 7V2h5M13 2h5v5M18 13v5h-5M7 18H2v-5" /></svg>
+          </button>
+        </section>
+      </div>
 
-      <!-- Barra con la última pista
-           (el lugar elegido se confirma con el bocadillo que sale en el mapa) -->
+      <!-- Barra con la última pista y, al acabar cada palabra, el botón para seguir
+           encima del resultado (el lugar elegido se confirma con el bocadillo que sale en el mapa) -->
       <div class="barra" id="barra">
-        <p class="barra__pista" id="pista">Toca en el mapa un lugar donde se diga esta palabra.</p>
-        <!-- Tarjeta de pista tras un fallo: brújula, temperatura y si te acercas -->
-        <div class="pista" id="pista-tarjeta" hidden>
-          <div class="pista__brujula" aria-hidden="true">
-            <svg class="pista__flecha" id="pista-flecha" viewBox="0 0 20 20">
-              <path d="M10 2 L16 10 H12 V18 H8 V10 H4 Z" fill="currentColor" />
-            </svg>
+        <!-- El resultado de la palabra (con el botón para seguir encima) y la tarjeta
+             de pista ocupan el mismo hueco (ver .barra__pistas) -->
+        <div class="barra__pistas">
+          <div class="barra__final">
+            <button class="boton boton--principal" id="boton-siguiente" type="button" hidden>Siguiente palabra →</button>
+            <p class="barra__pista" id="pista">Toca en el mapa un lugar donde se diga esta palabra.</p>
           </div>
-          <div class="pista__texto">
-            <p class="pista__temperatura">
-              <span id="pista-temperatura"></span>
-              <span class="termometro" aria-hidden="true"><i></i><i></i><i></i></span>
-            </p>
-            <p class="pista__rumbo" id="pista-rumbo"></p>
-            <p class="pista__detalle" id="pista-detalle"></p>
+          <!-- Tarjeta de pista tras un fallo: brújula, temperatura y si te acercas -->
+          <div class="pista" id="pista-tarjeta" hidden>
+            <div class="pista__brujula" aria-hidden="true">
+              <svg class="pista__flecha" id="pista-flecha" viewBox="0 0 20 20">
+                <path d="M10 2 L16 10 H12 V18 H8 V10 H4 Z" fill="currentColor" />
+              </svg>
+            </div>
+            <div class="pista__texto">
+              <p class="pista__temperatura">
+                <span id="pista-temperatura"></span>
+                <span class="termometro" aria-hidden="true"><i></i><i></i><i></i></span>
+              </p>
+              <p class="pista__rumbo" id="pista-rumbo"></p>
+              <p class="pista__detalle" id="pista-detalle"></p>
+            </div>
           </div>
         </div>
       </div>
@@ -115,6 +133,7 @@
     <h2 class="dialogo__titulo" id="ayuda-titulo">Cómo se juega</h2>
     <p>Cada día aparecen tres palabras del español que solo se usan en algunos lugares del mundo hispanohablante. Se juegan una tras otra.</p>
     <p>Con cada una, <strong>toca en el mapa un lugar donde se diga</strong> y confirma. Si se usa en varios sitios, vale cualquiera. Tienes <strong>tres intentos por palabra</strong>.</p>
+    <p>Para ver de cerca los países pequeños, <strong>amplía el mapa</strong> pellizcando con dos dedos o tocando dos veces, y muévelo con un dedo.</p>
     <h3 class="subtitulo">Pistas</h3>
     <ul class="dialogo__lista">
       <li><strong>Al primer fallo</strong>, una flecha señala hacia el lugar correcto más cercano y te dice si estás <em>caliente</em> (a menos de 1.500 km), <em>templado</em> (a menos de 4.000 km) o <em>frío</em>. Desde el segundo fallo, también te dice si <em>te acercas</em> o <em>te alejas</em>.</li>
