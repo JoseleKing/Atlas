@@ -99,10 +99,13 @@
     {
       "palabra": "pisto",
       "significado": "dinero",
-      "lugares": ["GT", "SV", "HN"],
+      "lugares": ["GT", "SV", "HN", "ES", "ES-CN"],
+      "otrosSignificados": [
+        { "lugares": ["ES", "ES-CN"], "significado": "fritada de pimientos, tomates, huevo, cebolla o de otros alimentos, picados y revueltos" }
+      ],
       "region": "Centroamérica",
       "equivalentes": { "España": "pasta", "México": "lana", "Argentina": "guita" },
-      "curiosidad": "En España, el pisto es un guiso de verduras, como el pisto manchego."
+      "curiosidad": "El más famoso de los pistos españoles es el pisto manchego."
     },
     {
       "palabra": "millo",

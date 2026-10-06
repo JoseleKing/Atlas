@@ -573,10 +573,11 @@ function pintarIntentos() {
   const quedan = CONFIG.INTENTOS - intentos.length;
   caja.setAttribute('aria-label', palabraTerminada ? 'Palabra terminada' : `Quedan ${quedan} intentos`);
 
-  // Al acabar cada palabra se desvela su significado.
+  // Al acabar cada palabra se desvela su significado (o sus significados).
   const significado = $('palabra-significado');
-  significado.textContent = palabra.significado ? `«${palabra.significado}»` : '';
-  significado.hidden = !palabraTerminada || !palabra.significado;
+  const textos = significados(palabra).map((s) => `«${s.significado}»`);
+  significado.textContent = textos.join(' o ');
+  significado.hidden = !palabraTerminada || !textos.length;
 }
 
 function pintarMapa(animar) {
@@ -639,7 +640,7 @@ function pintarPista(animar) {
   if (palabraTerminada) {
     const veredicto = document.createElement('strong');
     veredicto.textContent = ultimo.acierto ? `¡Acertaste ${ORDINALES[intentos.length - 1]}!` : 'No ha podido ser.';
-    pista.append(veredicto, ` Se dice en ${listaConY(nombresLugares(palabra))}.`);
+    pista.append(veredicto, ` Se dice en ${listaConY(nombresLugares(palabra.lugares))}.`);
     return;
   }
 
@@ -691,8 +692,17 @@ function listaConY(nombres) {
   return nombres.length > 1 ? `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}` : nombres[0] || '';
 }
 
-function nombresLugares(p) {
-  return p.lugares.filter((c) => LUGARES[c]).map((c) => LUGARES[c].nombre);
+function nombresLugares(lugares) {
+  return lugares.filter((c) => LUGARES[c]).map((c) => LUGARES[c].nombre);
+}
+
+// Significados de una palabra con los lugares de cada uno. El principal vale en
+// los lugares que no tengan otro en «otrosSignificados».
+function significados(p) {
+  const otros = (p.otrosSignificados || []).filter((o) => o.significado && o.lugares);
+  const conOtro = otros.flatMap((o) => o.lugares);
+  const principal = { significado: p.significado, lugares: p.lugares.filter((c) => !conOtro.includes(c)) };
+  return [principal, ...otros].filter((s) => s.significado);
 }
 
 function crear(etiqueta, clase, texto) {
@@ -715,8 +725,16 @@ function tarjetaPalabra(p, lista) {
     cabecera.push(crear('h3', 'resultado__texto', p.palabra));
   }
   // El significado no se muestra durante la partida: se desvela aquí.
-  const significado = p.significado ? ` significa «${p.significado}» y` : '';
-  cabecera.push(crear('p', 'resultado__lugares', `«${p.palabra}»${significado} se dice en ${listaConY(nombresLugares(p))}.`));
+  const sentidos = significados(p);
+  let texto;
+  if (sentidos.length > 1) {
+    const partes = sentidos.map((s) => `«${s.significado}» en ${listaConY(nombresLugares(s.lugares))}`);
+    texto = `«${p.palabra}» significa ${partes.slice(0, -1).join('; ')}, y ${partes[partes.length - 1]}.`;
+  } else {
+    const significado = sentidos.length ? ` significa «${sentidos[0].significado}» y` : '';
+    texto = `«${p.palabra}»${significado} se dice en ${listaConY(nombresLugares(p.lugares))}.`;
+  }
+  cabecera.push(crear('p', 'resultado__lugares', texto));
 
   const mas = [];
   const equivalentes = Object.entries(p.equivalentes || {});

@@ -52,6 +52,10 @@ Cada palabra:
 - `lugares` usa estos códigos: `ES`, `ES-CN`, `MX`, `GT`, `SV`, `HN`, `NI`, `CR`, `PA`,
   `CU`, `DO`, `PR`, `CO`, `VE`, `EC`, `PE`, `BO`, `CL`, `AR`, `UY`, `PY`.
 - `region` es el texto de la pista tras el segundo fallo.
+- Si en algunos lugares la palabra significa otra cosa, se añade
+  `"otrosSignificados": [{ "lugares": ["ES"], "significado": "…" }]`. Esos lugares
+  también van en `lugares` (todos cuentan como acierto) y `significado` queda para
+  los demás.
 - `equivalentes` puede quedar vacío (`{}`): entonces no se muestra esa parte.
 - Los días se recorren en orden desde `FECHA_INICIO` (en `juego.js`) y, al acabarse,
   se vuelve a empezar. Hay 40 días: el último es el 10 de noviembre de 2026 y el 11
