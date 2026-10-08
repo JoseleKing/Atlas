@@ -1174,15 +1174,12 @@ function pintar(animar = false) {
 
 /* ---------- Compartir ---------- */
 
-const CUADROS = { frio: '🟦', templado: '🟧', caliente: '🟥' };
-
+// Una marca por palabra: ▰ acertada, ▱ fallada. Ejemplo:
+//   Atlas nº 7 ▰▱▰ 2/3 aciertos
+//   joseleking.github.io/Atlas
 function textoCompartir() {
-  const lineas = rondas.map((lista) => {
-    const cuadros = lista.map((i) => (i.acierto ? '🟩' : CUADROS[claveTemperatura(i.temperatura)])).join('');
-    const acierto = lista.some((i) => i.acierto);
-    return `${cuadros}  ${acierto ? lista.length : 'X'}/${CONFIG.INTENTOS}`;
-  });
-  return `Atlas #${numero} 🗺️\n${lineas.join('\n')}\nRacha: ${rachaActual()}`;
+  const marcas = rondas.map((lista) => (lista.some((i) => i.acierto) ? '▰' : '▱')).join('');
+  return `Atlas nº ${numero} ${marcas} ${acertadas()}/${rondas.length} aciertos\njoseleking.github.io/Atlas`;
 }
 
 async function compartir() {
