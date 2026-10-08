@@ -191,8 +191,8 @@ function dibujarMapa() {
   const rayado = elementoSvg('pattern', {
     id: 'rayado', width: 3.5, height: 3.5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)',
   });
-  rayado.appendChild(elementoSvg('rect', { width: 3.5, height: 3.5, fill: '#E3D6BE' }));
-  rayado.appendChild(elementoSvg('line', { x1: 0, y1: 0, x2: 0, y2: 3.5, stroke: '#B9A88A', 'stroke-width': 1.2 }));
+  rayado.appendChild(elementoSvg('rect', { width: 3.5, height: 3.5, style: 'fill: var(--relleno)' }));
+  rayado.appendChild(elementoSvg('line', { x1: 0, y1: 0, x2: 0, y2: 3.5, style: 'stroke: var(--linea)', 'stroke-width': 1.2 }));
   defs.appendChild(rayado);
   svg.appendChild(defs);
 

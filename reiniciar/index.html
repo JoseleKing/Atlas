@@ -6,6 +6,15 @@
   <title>Reiniciar Atlas</title>
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#F3EBDD">
+  <script>
+    // Modo claro u oscuro: el que se elija en Almanaque, común a todos los juegos. Sin elegir, claro.
+    try {
+      if (localStorage.getItem('almanaque:tema') === 'dark') {
+        document.documentElement.dataset.theme = 'dark';
+        document.querySelector('meta[name="theme-color"]').content = '#1A1612';
+      }
+    } catch (e) {}
+  </script>
   <link rel="icon" href="../icons/logo.svg" type="image/svg+xml">
   <link rel="icon" href="../icons/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">

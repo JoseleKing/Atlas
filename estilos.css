@@ -14,10 +14,38 @@
   --templado: #C08A2E;  /* ocre */
   --caliente: var(--acento);
 
+  /* Mapa */
+  --tierra: var(--papel);     /* países del juego */
+  --rotulo: #9C8B6E;          /* rótulos y rosa de los vientos */
+  --pais-encima: #F1E6D2;     /* país bajo el dedo o el ratón */
+  --pais-elegido: #EBCFC2;
+  --pais-correcto-borde: #7E2B1F;
+  --destello: #fff;
+
   --titulos: 'IM Fell English', Georgia, 'Times New Roman', serif;
   --texto: 'EB Garamond', Georgia, 'Times New Roman', serif;
   --radio: 10px;
   --ancho-max: 440px;
+  color-scheme: light;
+}
+
+/* Modo oscuro: solo si se elige en Almanaque (data-theme lo pone index.html). */
+:root[data-theme="dark"] {
+  --fondo: #1A1612;
+  --papel: #2E261E;
+  --tinta: #EFE4CF;
+  --relleno: #2B241D;
+  --linea: #5A4B3B;
+  --tierra: #3D3329;
+  --acento: #D9675C;
+  --frio: #8DB3D1;
+  --templado: #D9A752;
+  --rotulo: #8F7E64;
+  --pais-encima: #4D4135;
+  --pais-elegido: #5E3329;
+  --pais-correcto-borde: #F2B3A8;
+  --destello: #3A3027;
+  color-scheme: dark;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -343,13 +371,13 @@ button { font: inherit; color: inherit; }
   font-style: italic;
   font-size: 9.5px;
   letter-spacing: .08em;
-  fill: #9C8B6E;
+  fill: var(--rotulo);
 }
 
-.mapa__rosa { fill: none; stroke: #9C8B6E; stroke-width: .7; }
-.mapa__rosa-norte { fill: #9C8B6E; }
+.mapa__rosa { fill: none; stroke: var(--rotulo); stroke-width: .7; }
+.mapa__rosa-norte { fill: var(--rotulo); }
 .mapa__rosa text {
-  fill: #9C8B6E;
+  fill: var(--rotulo);
   stroke: none;
   font-family: var(--titulos);
   font-size: 9px;
@@ -386,7 +414,7 @@ button { font: inherit; color: inherit; }
 
 /* Países del juego */
 .pais {
-  fill: var(--papel);
+  fill: var(--tierra);
   stroke: var(--tinta);
   stroke-width: calc(.6px * var(--trazo, 1));
   stroke-linejoin: round;
@@ -394,14 +422,14 @@ button { font: inherit; color: inherit; }
   transition: fill .2s;
 }
 
-.pais--encima { fill: #F1E6D2; }
+.pais--encima { fill: var(--pais-encima); }
 @media (hover: hover) {
-  .pais:hover { fill: #F1E6D2; }
+  .pais:hover { fill: var(--pais-encima); }
 }
 
-.pais[data-estado="elegido"] { fill: #EBCFC2; }
+.pais[data-estado="elegido"] { fill: var(--pais-elegido); }
 .pais[data-estado="fallo"] { fill: url(#rayado); cursor: default; }
-.pais[data-estado="correcto"] { fill: var(--acento); stroke: #7E2B1F; cursor: default; }
+.pais[data-estado="correcto"] { fill: var(--acento); stroke: var(--pais-correcto-borde); cursor: default; }
 .mapa--terminado .pais { cursor: default; }
 
 /* Nombres de los países: botones de al menos 44 × 44 px */
@@ -467,7 +495,7 @@ button { font: inherit; color: inherit; }
 
 .etiqueta[data-estado="fallo"] { cursor: default; }
 .etiqueta[data-estado="fallo"] .etiqueta__nombre {
-  color: rgba(43, 36, 32, .65);
+  color: color-mix(in srgb, var(--tinta) 65%, transparent);
   text-decoration: line-through;
   text-decoration-color: var(--acento);
 }
@@ -500,7 +528,7 @@ button { font: inherit; color: inherit; }
 .destello { animation: destello .45s ease; }
 
 @keyframes destello {
-  35% { background-color: #fff; box-shadow: 0 0 0 4px rgba(163, 58, 42, .18); }
+  35% { background-color: var(--destello); box-shadow: 0 0 0 4px rgba(163, 58, 42, .18); }
   100% { box-shadow: 0 0 0 0 rgba(163, 58, 42, 0); }
 }
 
@@ -747,7 +775,7 @@ button { font: inherit; color: inherit; }
 .pista__rumbo { font-size: 1.05rem; }
 
 .pista__detalle {
-  color: rgba(43, 36, 32, .7);
+  color: color-mix(in srgb, var(--tinta) 70%, transparent);
   font-size: .9rem;
 }
 
