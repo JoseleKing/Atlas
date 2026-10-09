@@ -14,8 +14,7 @@
 /* ---------- Configuración ---------- */
 
 const CONFIG = {
-  FECHA_INICIO: '2026-10-02',  // día nº 1 (hora de Madrid), en formato AAAA-MM-DD
-  ZONA_HORARIA: 'Europe/Madrid',
+  FECHA_INICIO: '2026-10-02',  // día nº 1 (hora local del jugador), en formato AAAA-MM-DD
   INTENTOS: 3,
   CALIENTE_KM: 1500,           // por debajo: «Caliente»
   TEMPLADO_KM: 4000,           // por debajo: «Templado»; por encima: «Frío»
@@ -23,13 +22,12 @@ const CONFIG = {
   CLAVE: 'atlas:v1',           // clave en localStorage
 };
 
-/* ---------- Fechas en hora de Madrid ---------- */
+/* ---------- Fechas en hora local del jugador ---------- */
 
-// Fecha de Madrid como «AAAA-MM-DD».
-function fechaMadrid(momento = new Date()) {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: CONFIG.ZONA_HORARIA, year: 'numeric', month: '2-digit', day: '2-digit',
-  }).format(momento);
+// Fecha local como «AAAA-MM-DD».
+function fechaLocal(momento = new Date()) {
+  const dos = (n) => String(n).padStart(2, '0');
+  return `${momento.getFullYear()}-${dos(momento.getMonth() + 1)}-${dos(momento.getDate())}`;
 }
 
 // Días entre dos fechas «AAAA-MM-DD».
@@ -40,25 +38,14 @@ function diasEntre(desde, hasta) {
 
 // Número del día de hoy: 1 el día de inicio, 2 el siguiente…
 function numeroDeHoy() {
-  return Math.max(1, diasEntre(CONFIG.FECHA_INICIO, fechaMadrid()) + 1);
+  return Math.max(1, diasEntre(CONFIG.FECHA_INICIO, fechaLocal()) + 1);
 }
 
-// Segundos que faltan para la medianoche de Madrid, también los días de cambio de hora (23 o 25 horas).
+// Segundos que faltan para la medianoche local, también los días de cambio de hora (23 o 25 horas).
 function segundosHastaMedianoche() {
-  const reloj = new Intl.DateTimeFormat('en-GB', {
-    timeZone: CONFIG.ZONA_HORARIA, day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-  });
-  const leer = (ms) => {
-    const partes = reloj.formatToParts(ms);
-    const valor = (tipo) => Number(partes.find((p) => p.type === tipo).value);
-    return { dia: valor('day'), segundos: valor('hour') * 3600 + valor('minute') * 60 + valor('second') };
-  };
-  const ahora = Date.now();
-  const hoy = leer(ahora);
-  const s = 86400 - hoy.segundos;
-  // Se mira qué hora marcará Madrid al cabo de s segundos y se corrige la diferencia.
-  const luego = leer(ahora + s * 1000);
-  return Math.max(0, luego.dia === hoy.dia ? s + 86400 - luego.segundos : s - luego.segundos);
+  const ahora = new Date();
+  const manana = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() + 1);
+  return Math.max(0, Math.ceil((manana - ahora) / 1000));
 }
 
 /* ---------- Almacenamiento (siempre dentro de try/catch) ---------- */
@@ -1212,11 +1199,11 @@ async function compartir() {
 
 function iniciarCuentaAtras() {
   if (temporizador) return;
-  const fechaInicial = fechaMadrid();
+  const fechaInicial = fechaLocal();
   const dos = (n) => String(n).padStart(2, '0');
   const tic = () => {
     // Nuevo día: se recarga para mostrar las palabras siguientes.
-    if (!modoPrueba && fechaMadrid() !== fechaInicial) { location.reload(); return; }
+    if (!modoPrueba && fechaLocal() !== fechaInicial) { location.reload(); return; }
     const s = segundosHastaMedianoche();
     $('cuenta-atras').textContent = `${dos(Math.floor(s / 3600))}:${dos(Math.floor((s % 3600) / 60))}:${dos(s % 60)}`;
   };
