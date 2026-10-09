@@ -1244,19 +1244,22 @@ function prepararAyuda() {
 /* ---------- Portada ---------- */
 
 // La portada con el logo se ve al menos PORTADA_MS desde que se abre la página
-// y luego se desvanece. La primera vez, al irse, se abre la ayuda.
+// y luego se desvanece. La primera vez, al irse, se abre la ayuda. Si tarda en
+// pintarse (la primera visita), se queda al menos PINTADA_MS desde entonces.
 const PORTADA_MS = 1500;
+const PINTADA_MS = 1400;
 const FUNDIDO_MS = 500;
 
 function retirarPortada() {
   const portada = $('portada');
+  const pintada = performance.getEntriesByName('first-contentful-paint')[0]?.startTime ?? performance.now();
   setTimeout(() => {
     portada.classList.add('portada--fuera');
     setTimeout(() => {
       portada.remove();
       if (!datos.ayudaVista && !modoPrueba && palabra) abrirAyuda();
     }, FUNDIDO_MS);
-  }, Math.max(0, PORTADA_MS - performance.now()));
+  }, Math.max(0, PORTADA_MS - performance.now(), PINTADA_MS - (performance.now() - pintada)));
 }
 
 /* ---------- Almanaque ---------- */
