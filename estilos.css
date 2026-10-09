@@ -87,7 +87,7 @@ button { font: inherit; color: inherit; }
   gap: 18px;
   padding: env(safe-area-inset-top) 16px env(safe-area-inset-bottom);
   background: var(--fondo);
-  transition: opacity .45s ease, visibility 0s .45s;
+  transition: opacity .5s ease, visibility 0s .5s;
 }
 
 .portada--fuera { opacity: 0; visibility: hidden; }

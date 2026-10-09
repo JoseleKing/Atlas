@@ -1245,8 +1245,8 @@ function prepararAyuda() {
 
 // La portada con el logo se ve al menos PORTADA_MS desde que se abre la página
 // y luego se desvanece. La primera vez, al irse, se abre la ayuda.
-const PORTADA_MS = 1200;
-const FUNDIDO_MS = 450;
+const PORTADA_MS = 1500;
+const FUNDIDO_MS = 500;
 
 function retirarPortada() {
   const portada = $('portada');
