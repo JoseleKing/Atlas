@@ -43,13 +43,22 @@ function numeroDeHoy() {
   return Math.max(1, diasEntre(CONFIG.FECHA_INICIO, fechaMadrid()) + 1);
 }
 
-// Segundos que faltan para la medianoche de Madrid.
+// Segundos que faltan para la medianoche de Madrid, también los días de cambio de hora (23 o 25 horas).
 function segundosHastaMedianoche() {
-  const partes = new Intl.DateTimeFormat('en-GB', {
-    timeZone: CONFIG.ZONA_HORARIA, hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
-  }).formatToParts(new Date());
-  const valor = (tipo) => Number(partes.find((p) => p.type === tipo).value);
-  return 86400 - (valor('hour') * 3600 + valor('minute') * 60 + valor('second'));
+  const reloj = new Intl.DateTimeFormat('en-GB', {
+    timeZone: CONFIG.ZONA_HORARIA, day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23',
+  });
+  const leer = (ms) => {
+    const partes = reloj.formatToParts(ms);
+    const valor = (tipo) => Number(partes.find((p) => p.type === tipo).value);
+    return { dia: valor('day'), segundos: valor('hour') * 3600 + valor('minute') * 60 + valor('second') };
+  };
+  const ahora = Date.now();
+  const hoy = leer(ahora);
+  const s = 86400 - hoy.segundos;
+  // Se mira qué hora marcará Madrid al cabo de s segundos y se corrige la diferencia.
+  const luego = leer(ahora + s * 1000);
+  return Math.max(0, luego.dia === hoy.dia ? s + 86400 - luego.segundos : s - luego.segundos);
 }
 
 /* ---------- Almacenamiento (siempre dentro de try/catch) ---------- */
