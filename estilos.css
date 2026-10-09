@@ -110,6 +110,39 @@ button { font: inherit; color: inherit; }
   from { opacity: 0; transform: scale(.92); }
 }
 
+/* El globo de la portada gira: cada meridiano es medio óvalo que se estrecha
+   y se ensancha (escala = seno de la longitud) y se apaga cerca del borde.
+   Van separados 30°, así que en cada momento puede verse igual que el logo. */
+.meridiano {
+  stroke-width: 1px;
+  vector-effect: non-scaling-stroke;
+  transform-box: view-box;
+  transform-origin: 100px 100px;
+  animation: meridiano 3.6s linear infinite;
+}
+
+/* Posición de partida (es la del logo) y retraso de cada uno */
+.meridiano:nth-child(1) { transform: scaleX(-1);    opacity: 0; animation-delay: 0s; }
+.meridiano:nth-child(2) { transform: scaleX(-.866); opacity: 0; animation-delay: -.6s; }
+.meridiano:nth-child(3) { transform: scaleX(-.5);               animation-delay: -1.2s; }
+.meridiano:nth-child(4) { transform: scaleX(.001);              animation-delay: -1.8s; }
+.meridiano:nth-child(5) { transform: scaleX(.5);                animation-delay: -2.4s; }
+.meridiano:nth-child(6) { transform: scaleX(.866);  opacity: 0; animation-delay: -3s; }
+
+@keyframes meridiano {
+  0%      { transform: scaleX(-1);    opacity: 0; }
+  16.667% { transform: scaleX(-.866); opacity: 0; }
+  25%     { transform: scaleX(-.707); }
+  33.333% { transform: scaleX(-.5);   opacity: 1; }
+  41.667% { transform: scaleX(-.259); }
+  50%     { transform: scaleX(.001); }
+  58.333% { transform: scaleX(.259); }
+  66.667% { transform: scaleX(.5);    opacity: 1; }
+  75%     { transform: scaleX(.707); }
+  83.333% { transform: scaleX(.866);  opacity: 0; }
+  100%    { transform: scaleX(1);     opacity: 0; }
+}
+
 /* ---------- Cabecera ---------- */
 
 .cabecera {
